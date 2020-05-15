@@ -37,7 +37,7 @@ url: "https://tyoc213.github.io" # the base hostname & protocol for your site, e
 baseurl: "/blog" # the subpath of your site, e.g. "/blog".
 
 # Github and twitter are optional:
-midnight:
+minima:
   social_links:
     twitter: tyoc213
     github: tyoc213
@@ -78,7 +78,7 @@ html_escape:
 
 # Everything below here should be left alone. Modifications may break fastpages
 future: true
-theme: midnight
+theme: minima
 plugins:
   - jekyll-feed
   - jekyll-gist
@@ -97,7 +97,7 @@ plugins:
 paginate: 15
 paginate_path: /page:num/
 
-remote_theme: jekyll/midnight
+remote_theme: jekyll/minima
 
 titles_from_headings:
   enabled:     true
