@@ -1,0 +1,78 @@
+[
+    {
+        "args": {},
+        "dur": 63.638999999999996,
+        "name": "add",
+        "ph": "X",
+        "pid": "CPU functions",
+        "tid": 1,
+        "ts": 29.703
+    },
+    {
+        "args": {},
+        "cat": "cpu_to_cuda",
+        "id": 0,
+        "name": "add",
+        "ph": "s",
+        "pid": "CPU functions",
+        "tid": 1,
+        "ts": 29.703
+    },
+    {
+        "args": {},
+        "cat": "cpu_to_cuda",
+        "id": 0,
+        "name": "add",
+        "ph": "f",
+        "pid": "CUDA functions",
+        "tid": 0,
+        "ts": -9.61100002861023
+    },
+    {
+        "args": {},
+        "dur": 6.912000417709351,
+        "name": "add",
+        "ph": "X",
+        "pid": "CUDA functions",
+        "tid": 0,
+        "ts": -9.61100002861023
+    },
+    {
+        "args": {},
+        "dur": 12.237000000000002,
+        "name": "empty",
+        "ph": "X",
+        "pid": "CPU functions",
+        "tid": 1,
+        "ts": 48.196
+    },
+    {
+        "args": {},
+        "cat": "cpu_to_cuda",
+        "id": 1,
+        "name": "empty",
+        "ph": "s",
+        "pid": "CPU functions",
+        "tid": 1,
+        "ts": 48.196
+    },
+    {
+        "args": {},
+        "cat": "cpu_to_cuda",
+        "id": 1,
+        "name": "empty",
+        "ph": "f",
+        "pid": "CUDA functions",
+        "tid": 0,
+        "ts": -7.434999910354614
+    },
+    {
+        "args": {},
+        "dur": 0.6400001049041748,
+        "name": "empty",
+        "ph": "X",
+        "pid": "CUDA functions",
+        "tid": 0,
+        "ts": -7.434999910354614
+    }
+]

@@ -1,0 +1,31 @@
+[
+
+    {
+
+        "cat": "MY_SUBSYSTEM",
+        "pid": 4260,
+        "tid": 4776,
+        "dur": 63.638999999999996,
+        "ts": 2168627920000,
+        "ph": "B",
+        "name": "doSomethingCostly",
+        "args": {
+            "nope": "more args"
+          }
+   
+   },
+   {
+
+    "cat": "MY_SUBSYSTEM",
+    "pid": 4260,
+    "tid": 4770,
+    "dur": 3.638999999999996,
+    "ts": 2168627922668,
+    "ph": "B",
+    "name": "doSomethingCostly",
+    "args": {
+        "nope": "more args"
+      }
+    }
+
+]

@@ -1,0 +1,20 @@
+[
+    {
+        "args": {},
+        "dur": 20.128,
+        "name": "add",
+        "ph": "X",
+        "pid": "CPU functions",
+        "tid": 1,
+        "ts": 10.453
+    },
+    {
+        "args": {},
+        "dur": 4.523,
+        "name": "empty",
+        "ph": "X",
+        "pid": "CPU functions",
+        "tid": 1,
+        "ts": 19.231
+    }
+]
