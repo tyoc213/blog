@@ -180,22 +180,22 @@ window.onload = wrap_img;
 <h1 id="Introduction">
 <a class="anchor" href="#Introduction" aria-hidden="true"><span class="octicon octicon-link"></span></a>Introduction<a class="anchor-link" href="#Introduction"> </a>
 </h1>
-<p>Since the time I found some issues mentioning GPU support <a href="https://github.com/pytorch/xla/">https://github.com/pytorch/xla/</a> I was wondering when I could use it locally because a little group at fastai community have been trying to give support to fastai and hopefully being hable to run locally would be usefull for that end.</p>
+<p>Since the time I found some issues mentioning GPU support <a href="https://github.com/pytorch/xla/">https://github.com/pytorch/xla/</a> I was wondering when I could use it locally because a little group at fastai community have been trying to give support to fastai and hopefully being able to run locally would be useful for that end.</p>
 <h1 id="Running-GPU-support-with-a-docker-image">
 <a class="anchor" href="#Running-GPU-support-with-a-docker-image" aria-hidden="true"><span class="octicon octicon-link"></span></a>Running GPU support with a docker image<a class="anchor-link" href="#Running-GPU-support-with-a-docker-image"> </a>
 </h1>
 <p>So the first thing was to run it with the docker image which if you have installed <a href="https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html">container-toolkit/install-guide</a> and then running something like <code>docker run --gpus all -it --shm-size 16G gcr.io/tpu-pytorch/xla@sha256:efe47b7a3875ddfa3ea9c68a12ed5517c19cbb3cf272776fba64bec8a683299f</code> or the sha or nightly you want to run like <code>gcr.io/tpu-pytorch/xla@nightly</code>.</p>
-<p>After I runned that, I compiled the source as <a href="https://github.com/pytorch/xla/blob/master/CONTRIBUTING.md">xla-instructions</a> inside that image and after some hours I could see a "hello" I have made on a cpp file <strong>wonderfull!!!</strong>. But it seems that all that work would be lost on next startyp, so after watch it build and run sucessfully I decided to give a go into building on my own computer (if you still need that then maybe check <code>docker commit xxxxx</code> and <code>docker checkpoint</code>).</p>
+<p>After I ran that, I compiled the source as <a href="https://github.com/pytorch/xla/blob/master/CONTRIBUTING.md">xla-instructions</a> inside that image and after some hours I could see a "hello" I have made on a cpp file <strong>wonderful!!!</strong>. But it seems that all that work would be lost on the next startup, so after watch building it and ran successfully I decided to give a go into building on my own computer (if you still need that then maybe check <code>docker commit xxxxx</code> and <code>docker checkpoint</code>).</p>
 <h1 id="Compiling-locally">
 <a class="anchor" href="#Compiling-locally" aria-hidden="true"><span class="octicon octicon-link"></span></a>Compiling locally<a class="anchor-link" href="#Compiling-locally"> </a>
 </h1>
-<p>To compile locally I have lurked and tested different ways, first time I build it was just with CPU support which I didnt notice (some env vars where missing), so long history short I have made a new environment with conda like <code>conda create -n xla python=3.6</code> and worked inside this env.</p>
+<p>To compile locally I have lurked and tested different ways, first time I build it was just with CPU support which I didn't notice (some env vars where missing), so long history short I have made a new environment with conda like <code>conda create -n xla python=3.6</code> and worked inside this env.</p>
 <h2 id="Installing-needed-things">
 <a class="anchor" href="#Installing-needed-things" aria-hidden="true"><span class="octicon octicon-link"></span></a>Installing needed things<a class="anchor-link" href="#Installing-needed-things"> </a>
 </h2>
 <p>Probably I miss something, but I have to install</p>
 <ul>
-<li>Dont use the cuda from apt, use <a href="https://developer.nvidia.com/cuda-downloads">directly from nvidia</a> and install only sdk with <code>sudo sh PATH_CUDA_DRIVERS --silent --toolkit</code> it will be installed to <code>/usr/local/cuda</code> which is where it should be located (if you let Ubuntu handle installation of drivers this <code>--toolkit</code> will not erase that and only install sdk so when updating kernel no need to reinstall).</li>
+<li>Don't use the cuda from apt, use <a href="https://developer.nvidia.com/cuda-downloads">directly from nvidia</a> and install only sdk with <code>sudo sh PATH_CUDA_DRIVERS --silent --toolkit</code> it will be installed to <code>/usr/local/cuda</code> which is where it should be located (if you let Ubuntu handle installation of drivers this <code>--toolkit</code> will not erase that and only install sdk so when updating kernel no need to reinstall).</li>
 <li>Install <a href="https://docs.nvidia.com/deeplearning/cudnn/install-guide/index.html">cuddn from NVIDIA from zip</a> file and copy all h files and libs
 <pre><code>sudo cp cuda/include/cudnn.h /usr/local/cuda/include
 sudo cp cuda/include/cudnn.h /usr/local/cuda/include
@@ -229,7 +229,7 @@ git clone --recursive https://github.com/pytorch/xla.git
 <span class="nb">cd</span> xla
 xla/scripts/apply_patches.sh
 </pre></div>
-<p>The last lines applies xla needed patches. Now you are ready to compile, but wait!!! what is missing is all the configuration that let you build inside the docker container!</p>
+<p>The last lines apply xla needed patches. Now you are ready to compile, but wait!!! what is missing is all the configuration that lets you build inside the docker container!</p>
 <h2 id="Environment-vars">
 <a class="anchor" href="#Environment-vars" aria-hidden="true"><span class="octicon octicon-link"></span></a>Environment vars<a class="anchor-link" href="#Environment-vars"> </a>
 </h2>
@@ -281,18 +281,18 @@ export XRT_DEVICE_MAP="CPU:0;/job:localservice/replica:0/task:0/device:XLA_CPU:0
 <h2 id="The-good-parts">
 <a class="anchor" href="#The-good-parts" aria-hidden="true"><span class="octicon octicon-link"></span></a>The good parts<a class="anchor-link" href="#The-good-parts"> </a>
 </h2>
+<p>the * It also means that we can have XLA tests running without TPU on a GPU and you don't need to compile, only get latest build and run on docker GPU, or locally with full compiling as explained above.</p>
 <ul>
-<li>It also means that we can have XLA test running without TPU on a GPU and you dont need to compile, only get latest build and run on docker GPU, or locally with full compiling.</li>
-<li>XLA GPU optimizations could maybe help your current work? and maybe some things can be tested locally before run full production on the cloud.</li>
-<li>The operations sended back to run on CPU locally <strong>feel</strong> not much slow as they are on TPUs just saying that maybe is more expansive to send ops to CPU on TPU that locally, but havent made a lot of tests and this should be only until all the ops are lowered to TPU.</li>
+<li>XLA GPU optimizations could maybe help your current work? and maybe some things can be tested locally before running full production on the cloud.</li>
+<li>The operations sended back to run on CPU locally <strong>feel</strong> not much slow as they are on TPUs just saying that maybe is more expensive to send ops to CPU on TPU that locally, but havent made a lot of tests and this should be only until all the ops are lowered to TPU.</li>
 <li>Have all locally allows to change things like you want, for example I can see the slowness of TPU operations inside the fastai loop with chrome://tracing/ modyfing learner and running the XLA-GPU. And have already found a issue haven't noticed in latest commits.</li>
 </ul>
 <h2 id="The-bad-parts">
 <a class="anchor" href="#The-bad-parts" aria-hidden="true"><span class="octicon octicon-link"></span></a>The bad parts<a class="anchor-link" href="#The-bad-parts"> </a>
 </h2>
 <ul>
-<li>I have been only able to step/debug on python code, not on CPP (but hopefully some one that read this knows a tip to check my vscode settings).</li>
-<li>maybe I forgot something more specific in this instructions, but if you find an error, please share.</li>
+<li>I have been only able to step/debug on python code, not on CPP (but hopefully someone that read this knows a tip to check my vscode settings).</li>
+<li>maybe I forgot something more specific in these instructions, but if you find an error, please share.</li>
 </ul>
 <h1 id="References">
 <a class="anchor" href="#References" aria-hidden="true"><span class="octicon octicon-link"></span></a>References<a class="anchor-link" href="#References"> </a>
