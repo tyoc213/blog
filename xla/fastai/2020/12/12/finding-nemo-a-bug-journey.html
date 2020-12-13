@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="twitter:card" content="summary_large_image" /><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>Finding nemo a bug journey | tyoc213 blog</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="Finding nemo a bug journey" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="follow up from having locally installed xla" />
+<meta property="og:description" content="follow up from having locally installed xla" />
+<link rel="canonical" href="https://tyoc213.github.io/blog/xla/fastai/2020/12/12/finding-nemo-a-bug-journey.html" />
+<meta property="og:url" content="https://tyoc213.github.io/blog/xla/fastai/2020/12/12/finding-nemo-a-bug-journey.html" />
+<meta property="og:site_name" content="tyoc213 blog" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2020-12-12T00:00:00-06:00" />
+<script type="application/ld+json">
+{"url":"https://tyoc213.github.io/blog/xla/fastai/2020/12/12/finding-nemo-a-bug-journey.html","@type":"BlogPosting","headline":"Finding nemo a bug journey","dateModified":"2020-12-12T00:00:00-06:00","datePublished":"2020-12-12T00:00:00-06:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://tyoc213.github.io/blog/xla/fastai/2020/12/12/finding-nemo-a-bug-journey.html"},"description":"follow up from having locally installed xla","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/blog/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://tyoc213.github.io/blog/feed.xml" title="tyoc213 blog" /><!-- the google_analytics_id gets auto inserted from the config file -->
+
+
+
+<script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','//www.google-analytics.com/analytics.js','ga');ga('create','UA-166763869-1','auto');ga('require','displayfeatures');ga('send','pageview');</script>
+
+<link rel="shortcut icon" type="image/x-icon" href="/blog/images/favicon.ico"><link href="https://unpkg.com/@primer/css/dist/primer.css" rel="stylesheet" />
+<link rel="stylesheet" href="//use.fontawesome.com/releases/v5.0.7/css/all.css"><!-- the google_analytics_id gets auto inserted from the config file -->
+
+
+
+<script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','//www.google-analytics.com/analytics.js','ga');ga('create','UA-166763869-1','auto');ga('require','displayfeatures');ga('send','pageview');</script>
+
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"> </script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js" integrity="sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous"></script>
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement( document.body, {
+        delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "[%", right: "%]", display: true},
+            {left: "$", right: "$", display: false}
+        ]}
+        );
+    });
+    </script>
+
+
+<script>
+function wrap_img(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+        var elements = document.querySelectorAll(".post img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("title") && (el.className != "emoji")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("title"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+    } else { document.addEventListener('DOMContentLoaded', fn); }
+}
+window.onload = wrap_img;
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+    // add link icon to anchor tags
+    var elem = document.querySelectorAll(".anchor-link")
+    elem.forEach(e => (e.innerHTML = '<i class="fas fa-link fa-xs"></i>'));
+    });
+</script>
+</head>
+<body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/blog/">tyoc213 blog</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/blog/about/">About Me</a><a class="page-link" href="/blog/search/">Search</a><a class="page-link" href="/blog/categories/">Tags</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Finding nemo a bug journey</h1><p class="page-description">follow up from having locally installed xla</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2020-12-12T00:00:00-06:00" itemprop="datePublished">
+        Dec 12, 2020
+      </time>
+       • <span class="read-time" title="Estimated read time">
+    
+    
+      5 min read
+    
+</span></p>
+
+    
+      <p class="category-tags"><i class="fas fa-tags category-tags-icon"></i></i> 
+      
+        <a class="category-tags-link" href="/blog/categories/#xla">xla</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/blog/categories/#fastai">fastai</a>
+        
+      
+      </p>
+    
+
+    
+      
+        <div class="pb-5 d-flex flex-wrap flex-justify-end">
+          <div class="px-2">
+
+    <a href="https://github.com/tyoc213/blog/tree/master/_notebooks/20201213-finding nemo a bug journey.ipynb" role="button" target="_blank">
+<img class="notebook-badge-image" src="/blog/assets/badges/github.svg" alt="View On GitHub">
+    </a>
+</div>
+
+          <div class="px-2">
+    <a href="https://mybinder.org/v2/gh/tyoc213/blog/master?filepath=_notebooks%2F20201213-finding+nemo+a+bug+journey.ipynb" target="_blank">
+        <img class="notebook-badge-image" src="/blog/assets/badges/binder.svg" alt="Open In Binder"/>
+    </a>
+</div>
+
+          <div class="px-2">
+    <a href="https://colab.research.google.com/github/tyoc213/blog/blob/master/_notebooks/20201213-finding nemo a bug journey.ipynb" target="_blank">
+        <img class="notebook-badge-image" src="/blog/assets/badges/colab.svg" alt="Open In Colab"/>
+    </a>
+</div>
+        </div>
+      </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <ul class="section-nav">
+<li class="toc-entry toc-h2"><a href="#Conclusion">Conclusion </a></li>
+</ul><!--
+#################################################
+### THIS FILE WAS AUTOGENERATED! DO NOT EDIT! ###
+#################################################
+# file to edit: _notebooks/20201213-finding nemo a bug journey.ipynb
+-->
+
+<div class="container" id="notebook-container">
+        
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The major part of the last months we were trying to solve one bug that we didn't know how to solve until this days, some time before fastai version 2 release having a POC and passing the hackathon we participated we left a little the project, but when we came back to it, there were some extrange things happening, some models where not training and apparently others where training, we didn't understand what happened, in that time we thought we introduced an error in our tiny code some way.</p>
+<p>So, these last few days since I had locally installed XLA and been able to run things, I planned to take a new round to find our bug and it was a perfect opportunity to test what having locally installed <code>pytorch</code>+<code>xla</code>+<code>fatai_xla_etensions</code> could do.</p>
+<p>So I passed a lot of assumptions to finally find the solution.</p>
+<ol>
+<li>So after having locally installed XLA, one of the first things I wanted to test is if locally I could reproduce the error, and I could!</li>
+<li>The first one was that the error was in our code, but having locally XLA allowed me to test the exact same code changing the device to either: CPU, CUDA or XLA. So I ended up having 2 data loaders and 2 trains on the same python file. Also one main point was that I wrapped a Adam but from pytorch with <code>OptimWrapper</code> and it trained correctly so I was more suspicious of differences between the optimizer from fastai and the native to pytorch because there is one know difference about <code>__getstate__</code> that is also a requirement for TPU Pods.</li>
+<li>In the past we have also thought that it was a freeze unfreeze problem, but it was also discarded, so this time I was checking the optimizer, but could not find why the params were not training even when looking under the lens.</li>
+<li>But after more testings and so on, I see that the second example started to train correctly while the first on the file not, and it was that with all the fresh runs, so I thought it was a problem with the learner, but could not find a "real problem" so I returned back to the optimizer and all, but this time I have a new "tool" I learned, counting the trainable parameters so, the trainable parameters their gradients are updated when you call <code>backward</code>, so I started to count there and for the first example they where <strong>always zero</strong> while for the second run since start, they have a number. So the next task was to find why on the first the trainable parameters are always zero and the second not.</li>
+</ol>
+<p>But I still didn't get why one model was training and the other one not!</p>
+<p>I passed <code>_BaseOptimizer</code>, <code>Optimizer</code>, <code>Learner</code> and others and still could not find the problem, so I decided to compare models and found the problem! I updated the example I found in pytorch forums <a href="https://discuss.pytorch.org/t/two-models-with-same-weights-different-results/8918/7">https://discuss.pytorch.org/t/two-models-with-same-weights-different-results/8918/7</a> the original one at first run did break because it compared tensors not on same device, so it threw error, I modified it so that it prints them nicely instead of being caught in that error.</p>
+<div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">compare_models</span><span class="p">(</span><span class="n">model_1</span><span class="p">,</span> <span class="n">model_2</span><span class="p">):</span>
+    <span class="n">models_differ</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">key_item_1</span><span class="p">,</span> <span class="n">key_item_2</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">model_1</span><span class="o">.</span><span class="n">state_dict</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">model_2</span><span class="o">.</span><span class="n">state_dict</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+        <span class="k">if</span> <span class="n">key_item_1</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">device</span> <span class="o">==</span> <span class="n">key_item_2</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">device</span>  <span class="ow">and</span> <span class="n">torch</span><span class="o">.</span><span class="n">equal</span><span class="p">(</span><span class="n">key_item_1</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">key_item_2</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+            <span class="k">pass</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">models_differ</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">key_item_1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">key_item_2</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+                <span class="n">_device</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">'device </span><span class="si">{</span><span class="n">key_item_1</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">device</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="n">key_item_2</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">device</span><span class="si">}</span><span class="s1">'</span> <span class="k">if</span> <span class="n">key_item_1</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">device</span> <span class="o">!=</span> <span class="n">key_item_2</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">device</span> <span class="k">else</span> <span class="s1">''</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Mismatch </span><span class="si">{</span><span class="n">_device</span><span class="si">}</span><span class="s1"> found at'</span><span class="p">,</span> <span class="n">key_item_1</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">Exception</span>
+    <span class="k">if</span> <span class="n">models_differ</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">'Models match perfectly! :)'</span><span class="p">)</span>
+</pre></div>
+<p>And that was the solution to the problem, I focused on seeing why the models parameters were on different devices. At the end I have something like (remember I don't need to patch the optimizer because I have all installed locally).</p>
+<div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">create_opt</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">'trainable count before'</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">all_params</span><span class="p">(</span><span class="n">with_grad</span><span class="o">=</span><span class="kc">True</span><span class="p">)))</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">opt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">opt_func</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">splitter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">),</span> <span class="n">lr</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lr</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">'trainable count after'</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">all_params</span><span class="p">(</span><span class="n">with_grad</span><span class="o">=</span><span class="kc">True</span><span class="p">)))</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">wd_bn_bias</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bn_bias_state</span><span class="p">(</span><span class="kc">True</span> <span class="p">):</span> <span class="n">p</span><span class="p">[</span><span class="s1">'do_wd'</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_bn</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bn_bias_state</span><span class="p">(</span><span class="kc">False</span><span class="p">):</span> <span class="n">p</span><span class="p">[</span><span class="s1">'force_train'</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+</pre></div>
+<p>and</p>
+<div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s1">'trainable count before backward'</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">all_params</span><span class="p">(</span><span class="n">with_grad</span><span class="o">=</span><span class="kc">True</span><span class="p">)))</span>
+        <span class="bp">self</span><span class="p">(</span><span class="s1">'before_backward'</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">'trainable count before backward'</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">all_params</span><span class="p">(</span><span class="n">with_grad</span><span class="o">=</span><span class="kc">True</span><span class="p">)))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_backward</span><span class="p">()</span>
+        <span class="bp">self</span><span class="p">(</span><span class="s1">'after_backward'</span><span class="p">)</span>
+</pre></div>
+<p>So at the end I see that even that the model is moved later to the device, the first time when <code>splitter=trainable_params</code> in <code>self.opt = self.opt_func(self.splitter(self.model), lr=self.lr)</code> inside <code>create_opt</code> it is not there, so the parameters where stuck on CPU while the the data and the model is later moved to the XLA device.</p>
+<p>This does not affects GPUs, but thinking about it could mean also something about the pickable behaviour of xla tensors, specially the optimizer, but that is an history for another time, right now, we have again a simple lib that works for <code>Single-device TPUs</code> where you need to modify zero code from fastai.</p>
+<h2 id="Conclusion">
+<a class="anchor" href="#Conclusion" aria-hidden="true"><span class="octicon octicon-link"></span></a>Conclusion<a class="anchor-link" href="#Conclusion"> </a>
+</h2>
+<p>So at the end it was and not was an error. But sure it was difficult to track, but knowing what it is is solvable now and we can continue forward.</p>
+<p>I hope to add in the next release a <code>show_lowering_ops</code> (or similar) to print the counters if you have hit some of those and it is easy to print in a model that runs with this activated. The <a href="https://github.com/butchland/fastai_xla_extensions/blob/master/samples/MNIST_TPU_demo.ipynb">MNIST demo</a> should be working again don't forget to peek at <a href="https://github.com/butchland/fastai_xla_extensions/">fastai_xla_extensions</a>.</p>
+<p>EXTRA NOTE: But there was error because XLA model on CPU not trained when updating backward from data operations on XLA device? well, now I think that XLA worked on TPU with model and data copied to TPU on first time but somehow our model got stuck on CPU so not trained, it became another model separate from the execution happening on TPU (I can think of pickable things, but that is unknown at the moment)</p>
+
+</div>
+</div>
+</div>
+</div>
+
+
+
+  </div><!-- from https://github.com/utterance/utterances -->
+<script src="https://utteranc.es/client.js"
+        repo="tyoc213/blog"
+        issue-term="title"
+        label="blogpost-comment"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script><a class="u-url" href="/blog/xla/fastai/2020/12/12/finding-nemo-a-bug-journey.html" hidden></a>
+</article>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/blog/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/blog/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/blog/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p>¡A volar!</p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/tyoc213" title="tyoc213"><svg class="svg-icon grey"><use xlink:href="/blog/assets/minima-social-icons.svg#github"></use></svg></a></li><li><a rel="me" href="https://twitter.com/tyoc213" title="tyoc213"><svg class="svg-icon grey"><use xlink:href="/blog/assets/minima-social-icons.svg#twitter"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
