@@ -1,4 +1,104 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.1.1">Jekyll</generator><link href="https://tyoc213.github.io/blog/feed.xml" rel="self" type="application/atom+xml" /><link href="https://tyoc213.github.io/blog/" rel="alternate" type="text/html" /><updated>2021-01-09T21:18:31-06:00</updated><id>https://tyoc213.github.io/blog/feed.xml</id><title type="html">tyoc213 blog</title><subtitle>¡A volar!</subtitle><entry><title type="html">Audio y auto estudio interview</title><link href="https://tyoc213.github.io/blog/fastchai/fastai/2021/01/09/fastchai-rbracco-audio-y-estudio-propio.html" rel="alternate" type="text/html" title="Audio y auto estudio interview" /><published>2021-01-09T00:00:00-06:00</published><updated>2021-01-09T00:00:00-06:00</updated><id>https://tyoc213.github.io/blog/fastchai/fastai/2021/01/09/fastchai-rbracco-audio-y-estudio-propio</id><content type="html" xml:base="https://tyoc213.github.io/blog/fastchai/fastai/2021/01/09/fastchai-rbracco-audio-y-estudio-propio.html">&lt;div class=&quot;jekyll-twitter-plugin&quot;&gt;&lt;blockquote class=&quot;twitter-tweet&quot;&gt;&lt;p lang=&quot;en&quot; dir=&quot;ltr&quot;&gt;Here&amp;#39;s my interview with Robbert Bracco &lt;a href=&quot;https://twitter.com/MadeUpMasters?ref_src=twsrc%5Etfw&quot;&gt;@MadeUpMasters&lt;/a&gt; (author of &amp;quot;Things Jeremy Says to do&amp;quot; on the &lt;a href=&quot;https://twitter.com/fastdotai?ref_src=twsrc%5Etfw&quot;&gt;@fastdotai&lt;/a&gt; forums) all about deep learning and &lt;a href=&quot;https://t.co/wANZD5nFcn&quot;&gt;https://t.co/wANZD5nFcn&lt;/a&gt; (library) applied to audio, self-study in ML.&lt;br /&gt;Audio: &lt;a href=&quot;https://t.co/T9CeIBtUKr&quot;&gt;https://t.co/T9CeIBtUKr&lt;/a&gt;&lt;br /&gt;&lt;br /&gt;Video: &lt;a href=&quot;https://t.co/ZCJzuxCIwG&quot;&gt;https://t.co/ZCJzuxCIwG&lt;/a&gt;&lt;/p&gt;&amp;mdash; Sanyam Bhutani (@bhutanisanyam1) &lt;a href=&quot;https://twitter.com/bhutanisanyam1/status/1168218396552351744?ref_src=twsrc%5Etfw&quot;&gt;September 1, 2019&lt;/a&gt;&lt;/blockquote&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.1.1">Jekyll</generator><link href="https://tyoc213.github.io/blog/feed.xml" rel="self" type="application/atom+xml" /><link href="https://tyoc213.github.io/blog/" rel="alternate" type="text/html" /><updated>2021-01-24T17:21:03-06:00</updated><id>https://tyoc213.github.io/blog/feed.xml</id><title type="html">tyoc213 blog</title><subtitle>¡A volar!</subtitle><entry><title type="html">Lowering SiLU in pytorch/XLA</title><link href="https://tyoc213.github.io/blog/xla/2021/01/24/op_lowering_pythorchXLA.html" rel="alternate" type="text/html" title="Lowering SiLU in pytorch/XLA" /><published>2021-01-24T00:00:00-06:00</published><updated>2021-01-24T00:00:00-06:00</updated><id>https://tyoc213.github.io/blog/xla/2021/01/24/op_lowering_pythorchXLA</id><content type="html" xml:base="https://tyoc213.github.io/blog/xla/2021/01/24/op_lowering_pythorchXLA.html">&lt;h1 id=&quot;introduction&quot;&gt;Introduction&lt;/h1&gt;
+
+&lt;p&gt;As a follow up of &lt;a href=&quot;https://tyoc213.github.io/blog/xla/fastai/2020/11/28/compiling-xla-locally.html&quot;&gt;compiling pytorch locally&lt;/a&gt;, the next objective was to lower an operation, but the documentation on pytorch and XLA is almost the same (think of XLA as an extension of Pytorch), you can check the &lt;a href=&quot;https://github.com/pytorch/xla/blob/master/OP_LOWERING_GUIDE.md&quot;&gt;OP_LOWERING_GUIDE&lt;/a&gt; which basically is &lt;a href=&quot;https://pytorch.org/xla/release/1.7/index.html#op-lowering-guide&quot;&gt;OP LOWERING GUIDE&lt;/a&gt; from pytorch, probably you will get it at first hand, but I was not exactly sure what to do next for example I didn’t know when to modify &lt;a href=&quot;https://github.com/pytorch/xla/blob/master/scripts/gen.py&quot;&gt;gen.py&lt;/a&gt; (which you don’t need if it is already in &lt;a href=&quot;https://github.com/pytorch/xla/issues/2717#issuecomment-755007143&quot;&gt;see&lt;/a&gt; and other things.&lt;/p&gt;
+
+&lt;h2 id=&quot;what-says-the-op-lowering-guide&quot;&gt;What says the op lowering guide?&lt;/h2&gt;
+
+&lt;p&gt;Now that I have lowered an op, I think what the lowering guide says is something like this:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;That you need to have an environment to compile/test/run&lt;/li&gt;
+  &lt;li&gt;That you need to understand the operation &lt;a href=&quot;https://pytorch.org/docs/stable/generated/torch.nn.SiLU.html&quot;&gt;SiLU&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;That you need to implement new operations copying verbatim the signature from header and cpp files to &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;aten_xla_type.h/cpp&lt;/code&gt; from &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;aten_xla_type_default.h/cpp&lt;/code&gt;&lt;/li&gt;
+  &lt;li&gt;You will use &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;XLATensor&lt;/code&gt; tensors as input and output as pytorch tensor (ATen means “a tensor library”)&lt;/li&gt;
+  &lt;li&gt;From this level in &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;tensor_methods&lt;/code&gt; will be &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;ir&lt;/code&gt; ops that are constructed from pytorch to use the &lt;a href=&quot;https://www.tensorflow.org/xla/operation_semantics&quot;&gt;tensorflow XLA compiler ops&lt;/a&gt; (which I think it is not exhaustive? not all is output to the doc?). This operations include for example the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;*&lt;/code&gt; I used and &lt;a href=&quot;https://github.com/pytorch/xla/blob/3eaee46ef679cc6a0f1f694bd0a007dbfd09c51b/torch_xla/csrc/elementwise.cpp#L176-L181&quot;&gt;xla::Sigmoid&lt;/a&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;They also list 2 &lt;a href=&quot;https://github.com/pytorch/xla/pull/1592&quot;&gt;Add inverse op and test&lt;/a&gt; and &lt;a href=&quot;https://github.com/pytorch/xla/pull/1940&quot;&gt;Implement the lowering for HardSigmoid and HardSigmoidBackward&lt;/a&gt; which could help and are a good start too.&lt;/p&gt;
+
+&lt;h1 id=&quot;the-opportunity&quot;&gt;The opportunity&lt;/h1&gt;
+
+&lt;p&gt;I asked in which op I can contribute and &lt;a href=&quot;https://github.com/JackCaoG&quot;&gt;JackCaoG&lt;/a&gt; suggested the ones that were in the backlog, unfortunately they were probably not entry level, by fortune little time after the opportunity showed up  &lt;a href=&quot;https://github.com/pytorch/xla/issues/2717&quot;&gt;here&lt;/a&gt; and this SiLU op was good for entry level because as description says it uses as base Sigmoid which is already lowered also JackCaoG said it should be mostly like &lt;a href=&quot;https://github.com/pytorch/xla/blob/1a56d70a9a48446536912d80c6f929519453258e/torch_xla/csrc/tensor_methods.cpp#L2352-L2364&quot;&gt;sigmoid&lt;/a&gt; or &lt;a href=&quot;https://github.com/pytorch/xla/blob/1a56d70a9a48446536912d80c6f929519453258e/torch_xla/csrc/tensor_methods.cpp#L1590-L1602&quot;&gt;log_sigmoid&lt;/a&gt;  and from the description on the documentation it looked like that.&lt;/p&gt;
+
+&lt;p&gt;I really don’t know much about pytorch and sure I didn’t know of SiLU before, but the signature of SiLU was not like those provided as base, I finally checked the other ops that ended with &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;_out(&lt;/code&gt; as example &lt;a href=&quot;https://github.com/pytorch/xla/blob/1a56d70a9a48446536912d80c6f929519453258e/torch_xla/csrc/aten_xla_type.cpp#L566-L572&quot;&gt;arange_out&lt;/a&gt;&lt;/p&gt;
+
+&lt;h1 id=&quot;implementation&quot;&gt;Implementation&lt;/h1&gt;
+
+&lt;p&gt;As always, create a new branch and don’t forget to update to the latest master in pytorch and XLA (which in my case caused some behaviour about synching the repos).&lt;/p&gt;
+
+&lt;h2 id=&quot;1-create-the-base&quot;&gt;1. Create the base&lt;/h2&gt;
+
+&lt;p&gt;First commit https://github.com/pytorch/xla/pull/2721/commits/c16fedbbee3662d3470629dc7fff51c63dd60855&lt;/p&gt;
+
+&lt;p&gt;It provides the base and starting point:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;Copy the signature from the header and implementation of to ``&lt;/li&gt;
+  &lt;li&gt;Copy the body from the header to .&lt;/li&gt;
+  &lt;li&gt;It also reused at a higher level the Sigmoid as expected, the problem with this is that the generated graph for the compiler will list this as a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;x * sigmoid(x)&lt;/code&gt; (which was basically this &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;input.GetIrValue() * ir::ops::Sigmoid(input.GetIrValue());&lt;/code&gt;) instead of a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;SiLU&lt;/code&gt; in the node graph.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;But this implementation was good enough to compile without errors and actually run my rudimentary base test that output the same values for cpu implementation and XLA implementation&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;torch&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;torch.nn&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;SiLU&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;torch_xla.core.xla_model&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;as&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;xm&lt;/span&gt;
+
+
+&lt;span class=&quot;n&quot;&gt;dede&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;xm&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;xla_device&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;m&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;SiLU&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;m&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;m&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;to&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;dede&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+&lt;span class=&quot;nb&quot;&gt;input&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;torch&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;randn&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;input2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;input&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;clone&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;# this is on CPU
+&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;input&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;input&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;to&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;dede&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;output&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;m&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;input&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;output&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;output&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;device&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;# should print xla
+&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;m2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;SiLU&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;normal&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'input2'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;input2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;o2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;m2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;input2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;o2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;# this should match print above
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;The review of the PR suggested the next step, which is:&lt;/p&gt;
+
+&lt;h2 id=&quot;2-go-deeper-with-the-lowering&quot;&gt;2. Go deeper with the lowering&lt;/h2&gt;
+
+&lt;p&gt;Now that you have a base go deeper and make your node appear.&lt;/p&gt;
+
+&lt;p&gt;Because when people is debugging the generated graph of tensor ops in XLA with the previous implementation it would be better if calling &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;SiLU&lt;/code&gt; would generate a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;SiLU&lt;/code&gt; node and not &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;x * sigmoid(x)&lt;/code&gt; as the previous step.&lt;/p&gt;
+
+&lt;p&gt;Second commit https://github.com/pytorch/xla/pull/2721/commits/c16fedbbee3662d3470629dc7fff51c63dd60855&lt;/p&gt;
+
+&lt;p&gt;It shows how to add an op that will be used as a node in the generated graph for the operation.&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;It adds the operation to &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;ops.h/cpp&lt;/code&gt;&lt;/li&gt;
+  &lt;li&gt;It converts from tensors to XLA tensors and back.&lt;/li&gt;
+  &lt;li&gt;It reuses at this level the implementation of SiLU (which is valid because you have already named the node at this level) which is &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;node.ReturnOp(xla_input * BuildSigmoid(xla_input), loctx)&lt;/code&gt; and provides a “name” for the node with &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;GenericOp(OpKind(at::aten::silu), {input}, input.shape(), std::move(lower_fn))&lt;/code&gt;.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;My first approach was to repeat all so I duplicated the &lt;a href=&quot;https://github.com/pytorch/xla/blob/3eaee46ef679cc6a0f1f694bd0a007dbfd09c51b/torch_xla/csrc/elementwise.cpp#L176-L181&quot;&gt;sigmoid implemented&lt;/a&gt; in &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;elementwise.h/cpp&lt;/code&gt;  and used that but the review of the PR suggested that I can call sigmoid because the node was already a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;SiLU&lt;/code&gt; so it doesn’t matter if I reused what was already there at that moment. I corrected with an amended and just reused Sigmoid instead of my SiLU in elementwise, making the commit writes 2 less files than amended commit.&lt;/p&gt;
+
+&lt;h2 id=&quot;the-backward-pass&quot;&gt;The backward pass&lt;/h2&gt;
+
+&lt;p&gt;This operation didn’t include a backward pass, you should implement it if the header contains the forward and the backward pass, this was more a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;_out&lt;/code&gt; operation that is also used for in place methods.&lt;/p&gt;
+
+&lt;p&gt;Note: I haven’t seen how this &lt;em&gt;dispatch&lt;/em&gt; works, but I guess works like &lt;em&gt;simple inheritance&lt;/em&gt;, when &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;aten_xla_type&lt;/code&gt; don’t provide the method then the ones from &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;aten_xla_type_default&lt;/code&gt; are used (which is the CPU implementations and &lt;em&gt;fallbacks&lt;/em&gt;). But see that the type &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;AtenXlaType&lt;/code&gt; is not a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;subclass&lt;/code&gt; &lt;a href=&quot;https://github.com/pytorch/xla/blob/master/torch_xla/csrc/aten_xla_type.cpp#L26-L30&quot;&gt;aten_xla_type&lt;/a&gt;”&lt;/p&gt;
+
+&lt;p&gt;“Also note that &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;aten_xla_type_default&lt;/code&gt; which is auto generated after build in some stage because it is not in repo and is ignored in &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;.gitignore&lt;/code&gt;. So it should be other type of &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;dynamic dispatching&lt;/code&gt; somewhere &lt;em&gt;deep in the code&lt;/em&gt;.&lt;/p&gt;
+
+&lt;h1 id=&quot;conclusion&quot;&gt;Conclusion&lt;/h1&gt;
+
+&lt;p&gt;Lowering an op is difficult, but practice does help and easy tasks does too. You also need to provide a test case, which probably is just to take a template from a previous one (because test from CPU pytorch are used as base).&lt;/p&gt;
+
+&lt;p&gt;There are different things you need to know at less a little: pytorch, XLA, C++ (to see how the default operation is implemented), even some cuda if you can read that and take it as reference apart from the default CPU implementations and “cpu_fallback” (which I still don’t know how they differ from CPU implementations or when they are used).&lt;/p&gt;
+
+&lt;p&gt;Hopefully this little explanation will help another person who wants to contribute lowering ops and understand a little better what is explained on the op lowering guide.&lt;/p&gt;</content><author><name></name></author><category term="xla" /><summary type="html">Introduction</summary></entry><entry><title type="html">Audio y auto estudio interview</title><link href="https://tyoc213.github.io/blog/fastchai/fastai/2021/01/09/fastchai-rbracco-audio-y-estudio-propio.html" rel="alternate" type="text/html" title="Audio y auto estudio interview" /><published>2021-01-09T00:00:00-06:00</published><updated>2021-01-09T00:00:00-06:00</updated><id>https://tyoc213.github.io/blog/fastchai/fastai/2021/01/09/fastchai-rbracco-audio-y-estudio-propio</id><content type="html" xml:base="https://tyoc213.github.io/blog/fastchai/fastai/2021/01/09/fastchai-rbracco-audio-y-estudio-propio.html">&lt;div class=&quot;jekyll-twitter-plugin&quot;&gt;&lt;blockquote class=&quot;twitter-tweet&quot;&gt;&lt;p lang=&quot;en&quot; dir=&quot;ltr&quot;&gt;Here&amp;#39;s my interview with Robbert Bracco &lt;a href=&quot;https://twitter.com/MadeUpMasters?ref_src=twsrc%5Etfw&quot;&gt;@MadeUpMasters&lt;/a&gt; (author of &amp;quot;Things Jeremy Says to do&amp;quot; on the &lt;a href=&quot;https://twitter.com/fastdotai?ref_src=twsrc%5Etfw&quot;&gt;@fastdotai&lt;/a&gt; forums) all about deep learning and &lt;a href=&quot;https://t.co/wANZD5nFcn&quot;&gt;https://t.co/wANZD5nFcn&lt;/a&gt; (library) applied to audio, self-study in ML.&lt;br /&gt;Audio: &lt;a href=&quot;https://t.co/T9CeIBtUKr&quot;&gt;https://t.co/T9CeIBtUKr&lt;/a&gt;&lt;br /&gt;&lt;br /&gt;Video: &lt;a href=&quot;https://t.co/ZCJzuxCIwG&quot;&gt;https://t.co/ZCJzuxCIwG&lt;/a&gt;&lt;/p&gt;&amp;mdash; Sanyam Bhutani (@bhutanisanyam1) &lt;a href=&quot;https://twitter.com/bhutanisanyam1/status/1168218396552351744?ref_src=twsrc%5Etfw&quot;&gt;September 1, 2019&lt;/a&gt;&lt;/blockquote&gt;
 &lt;script async=&quot;&quot; src=&quot;https://platform.twitter.com/widgets.js&quot; charset=&quot;utf-8&quot;&gt;&lt;/script&gt;
 &lt;/div&gt;
 

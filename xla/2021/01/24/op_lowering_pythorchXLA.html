@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="twitter:card" content="summary_large_image" /><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>Lowering SiLU in pytorch/XLA | tyoc213 blog</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="Lowering SiLU in pytorch/XLA" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Lowering SiLU operation in Pytorch/XLA" />
+<meta property="og:description" content="Lowering SiLU operation in Pytorch/XLA" />
+<link rel="canonical" href="https://tyoc213.github.io/blog/xla/2021/01/24/op_lowering_pythorchXLA.html" />
+<meta property="og:url" content="https://tyoc213.github.io/blog/xla/2021/01/24/op_lowering_pythorchXLA.html" />
+<meta property="og:site_name" content="tyoc213 blog" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-01-24T00:00:00-06:00" />
+<script type="application/ld+json">
+{"url":"https://tyoc213.github.io/blog/xla/2021/01/24/op_lowering_pythorchXLA.html","@type":"BlogPosting","headline":"Lowering SiLU in pytorch/XLA","dateModified":"2021-01-24T00:00:00-06:00","datePublished":"2021-01-24T00:00:00-06:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://tyoc213.github.io/blog/xla/2021/01/24/op_lowering_pythorchXLA.html"},"description":"Lowering SiLU operation in Pytorch/XLA","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/blog/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://tyoc213.github.io/blog/feed.xml" title="tyoc213 blog" /><!-- the google_analytics_id gets auto inserted from the config file -->
+
+
+
+<script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','//www.google-analytics.com/analytics.js','ga');ga('create','UA-166763869-1','auto');ga('require','displayfeatures');ga('send','pageview');</script>
+
+<link rel="shortcut icon" type="image/x-icon" href="/blog/images/favicon.ico"><link href="https://unpkg.com/@primer/css/dist/primer.css" rel="stylesheet" />
+<link rel="stylesheet" href="//use.fontawesome.com/releases/v5.0.7/css/all.css"><!-- the google_analytics_id gets auto inserted from the config file -->
+
+
+
+<script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','//www.google-analytics.com/analytics.js','ga');ga('create','UA-166763869-1','auto');ga('require','displayfeatures');ga('send','pageview');</script>
+
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"> </script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js" integrity="sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous"></script>
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement( document.body, {
+        delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "[%", right: "%]", display: true},
+            {left: "$", right: "$", display: false}
+        ]}
+        );
+    });
+    </script>
+
+
+<script>
+function wrap_img(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+        var elements = document.querySelectorAll(".post img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("title") && (el.className != "emoji")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("title"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+    } else { document.addEventListener('DOMContentLoaded', fn); }
+}
+window.onload = wrap_img;
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+    // add link icon to anchor tags
+    var elem = document.querySelectorAll(".anchor-link")
+    elem.forEach(e => (e.innerHTML = '<i class="fas fa-link fa-xs"></i>'));
+    });
+</script>
+</head>
+<body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/blog/">tyoc213 blog</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/blog/about/">About Me</a><a class="page-link" href="/blog/search/">Search</a><a class="page-link" href="/blog/categories/">Tags</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Lowering SiLU in pytorch/XLA</h1><p class="page-description">Lowering SiLU operation in Pytorch/XLA</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2021-01-24T00:00:00-06:00" itemprop="datePublished">
+        Jan 24, 2021
+      </time>
+       • <span class="read-time" title="Estimated read time">
+    
+    
+      5 min read
+    
+</span></p>
+
+    
+      <p class="category-tags"><i class="fas fa-tags category-tags-icon"></i></i> 
+      
+        <a class="category-tags-link" href="/blog/categories/#xla">xla</a>
+        
+      
+      </p>
+    
+
+    </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <ul class="section-nav">
+<li class="toc-entry toc-h1"><a href="#introduction">Introduction</a>
+<ul>
+<li class="toc-entry toc-h2"><a href="#what-says-the-op-lowering-guide">What says the op lowering guide?</a></li>
+</ul>
+</li>
+<li class="toc-entry toc-h1"><a href="#the-opportunity">The opportunity</a></li>
+<li class="toc-entry toc-h1"><a href="#implementation">Implementation</a>
+<ul>
+<li class="toc-entry toc-h2"><a href="#1-create-the-base">1. Create the base</a></li>
+<li class="toc-entry toc-h2"><a href="#2-go-deeper-with-the-lowering">2. Go deeper with the lowering</a></li>
+<li class="toc-entry toc-h2"><a href="#the-backward-pass">The backward pass</a></li>
+</ul>
+</li>
+<li class="toc-entry toc-h1"><a href="#conclusion">Conclusion</a></li>
+</ul><h1 id="introduction">
+<a class="anchor" href="#introduction" aria-hidden="true"><span class="octicon octicon-link"></span></a>Introduction</h1>
+
+<p>As a follow up of <a href="https://tyoc213.github.io/blog/xla/fastai/2020/11/28/compiling-xla-locally.html">compiling pytorch locally</a>, the next objective was to lower an operation, but the documentation on pytorch and XLA is almost the same (think of XLA as an extension of Pytorch), you can check the <a href="https://github.com/pytorch/xla/blob/master/OP_LOWERING_GUIDE.md">OP_LOWERING_GUIDE</a> which basically is <a href="https://pytorch.org/xla/release/1.7/index.html#op-lowering-guide">OP LOWERING GUIDE</a> from pytorch, probably you will get it at first hand, but I was not exactly sure what to do next for example I didn’t know when to modify <a href="https://github.com/pytorch/xla/blob/master/scripts/gen.py">gen.py</a> (which you don’t need if it is already in <a href="https://github.com/pytorch/xla/issues/2717#issuecomment-755007143">see</a> and other things.</p>
+
+<h2 id="what-says-the-op-lowering-guide">
+<a class="anchor" href="#what-says-the-op-lowering-guide" aria-hidden="true"><span class="octicon octicon-link"></span></a>What says the op lowering guide?</h2>
+
+<p>Now that I have lowered an op, I think what the lowering guide says is something like this:</p>
+
+<ol>
+  <li>That you need to have an environment to compile/test/run</li>
+  <li>That you need to understand the operation <a href="https://pytorch.org/docs/stable/generated/torch.nn.SiLU.html">SiLU</a>
+</li>
+  <li>That you need to implement new operations copying verbatim the signature from header and cpp files to <code class="language-plaintext highlighter-rouge">aten_xla_type.h/cpp</code> from <code class="language-plaintext highlighter-rouge">aten_xla_type_default.h/cpp</code>
+</li>
+  <li>You will use <code class="language-plaintext highlighter-rouge">XLATensor</code> tensors as input and output as pytorch tensor (ATen means “a tensor library”)</li>
+  <li>From this level in <code class="language-plaintext highlighter-rouge">tensor_methods</code> will be <code class="language-plaintext highlighter-rouge">ir</code> ops that are constructed from pytorch to use the <a href="https://www.tensorflow.org/xla/operation_semantics">tensorflow XLA compiler ops</a> (which I think it is not exhaustive? not all is output to the doc?). This operations include for example the <code class="language-plaintext highlighter-rouge">*</code> I used and <a href="https://github.com/pytorch/xla/blob/3eaee46ef679cc6a0f1f694bd0a007dbfd09c51b/torch_xla/csrc/elementwise.cpp#L176-L181">xla::Sigmoid</a>
+</li>
+</ol>
+
+<p>They also list 2 <a href="https://github.com/pytorch/xla/pull/1592">Add inverse op and test</a> and <a href="https://github.com/pytorch/xla/pull/1940">Implement the lowering for HardSigmoid and HardSigmoidBackward</a> which could help and are a good start too.</p>
+
+<h1 id="the-opportunity">
+<a class="anchor" href="#the-opportunity" aria-hidden="true"><span class="octicon octicon-link"></span></a>The opportunity</h1>
+
+<p>I asked in which op I can contribute and <a href="https://github.com/JackCaoG">JackCaoG</a> suggested the ones that were in the backlog, unfortunately they were probably not entry level, by fortune little time after the opportunity showed up  <a href="https://github.com/pytorch/xla/issues/2717">here</a> and this SiLU op was good for entry level because as description says it uses as base Sigmoid which is already lowered also JackCaoG said it should be mostly like <a href="https://github.com/pytorch/xla/blob/1a56d70a9a48446536912d80c6f929519453258e/torch_xla/csrc/tensor_methods.cpp#L2352-L2364">sigmoid</a> or <a href="https://github.com/pytorch/xla/blob/1a56d70a9a48446536912d80c6f929519453258e/torch_xla/csrc/tensor_methods.cpp#L1590-L1602">log_sigmoid</a>  and from the description on the documentation it looked like that.</p>
+
+<p>I really don’t know much about pytorch and sure I didn’t know of SiLU before, but the signature of SiLU was not like those provided as base, I finally checked the other ops that ended with <code class="language-plaintext highlighter-rouge">_out(</code> as example <a href="https://github.com/pytorch/xla/blob/1a56d70a9a48446536912d80c6f929519453258e/torch_xla/csrc/aten_xla_type.cpp#L566-L572">arange_out</a></p>
+
+<h1 id="implementation">
+<a class="anchor" href="#implementation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Implementation</h1>
+
+<p>As always, create a new branch and don’t forget to update to the latest master in pytorch and XLA (which in my case caused some behaviour about synching the repos).</p>
+
+<h2 id="1-create-the-base">
+<a class="anchor" href="#1-create-the-base" aria-hidden="true"><span class="octicon octicon-link"></span></a>1. Create the base</h2>
+
+<p>First commit https://github.com/pytorch/xla/pull/2721/commits/c16fedbbee3662d3470629dc7fff51c63dd60855</p>
+
+<p>It provides the base and starting point:</p>
+
+<ol>
+  <li>Copy the signature from the header and implementation of to ``</li>
+  <li>Copy the body from the header to .</li>
+  <li>It also reused at a higher level the Sigmoid as expected, the problem with this is that the generated graph for the compiler will list this as a <code class="language-plaintext highlighter-rouge">x * sigmoid(x)</code> (which was basically this <code class="language-plaintext highlighter-rouge">input.GetIrValue() * ir::ops::Sigmoid(input.GetIrValue());</code>) instead of a <code class="language-plaintext highlighter-rouge">SiLU</code> in the node graph.</li>
+</ol>
+
+<p>But this implementation was good enough to compile without errors and actually run my rudimentary base test that output the same values for cpu implementation and XLA implementation</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">torch.nn</span> <span class="kn">import</span> <span class="n">SiLU</span>
+<span class="kn">import</span> <span class="nn">torch_xla.core.xla_model</span> <span class="k">as</span> <span class="n">xm</span>
+
+
+<span class="n">dede</span><span class="o">=</span><span class="n">xm</span><span class="p">.</span><span class="n">xla_device</span><span class="p">()</span>
+<span class="n">m</span> <span class="o">=</span> <span class="n">SiLU</span><span class="p">()</span>
+<span class="n">m</span> <span class="o">=</span> <span class="n">m</span><span class="p">.</span><span class="n">to</span><span class="p">(</span><span class="n">dede</span><span class="p">)</span>
+
+<span class="nb">input</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">input2</span> <span class="o">=</span> <span class="nb">input</span><span class="p">.</span><span class="n">clone</span><span class="p">()</span> <span class="c1"># this is on CPU
+</span><span class="nb">input</span> <span class="o">=</span> <span class="nb">input</span><span class="p">.</span><span class="n">to</span><span class="p">(</span><span class="n">dede</span><span class="p">)</span>
+
+<span class="n">output</span> <span class="o">=</span> <span class="n">m</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">output</span><span class="p">.</span><span class="n">device</span><span class="p">)</span> <span class="c1"># should print xla
+</span>
+<span class="n">m2</span> <span class="o">=</span> <span class="n">SiLU</span><span class="p">()</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"normal"</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">'input2'</span><span class="p">,</span> <span class="n">input2</span><span class="p">)</span>
+<span class="n">o2</span> <span class="o">=</span> <span class="n">m2</span><span class="p">(</span><span class="n">input2</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">o2</span><span class="p">)</span> <span class="c1"># this should match print above
+</span></code></pre></div></div>
+
+<p>The review of the PR suggested the next step, which is:</p>
+
+<h2 id="2-go-deeper-with-the-lowering">
+<a class="anchor" href="#2-go-deeper-with-the-lowering" aria-hidden="true"><span class="octicon octicon-link"></span></a>2. Go deeper with the lowering</h2>
+
+<p>Now that you have a base go deeper and make your node appear.</p>
+
+<p>Because when people is debugging the generated graph of tensor ops in XLA with the previous implementation it would be better if calling <code class="language-plaintext highlighter-rouge">SiLU</code> would generate a <code class="language-plaintext highlighter-rouge">SiLU</code> node and not <code class="language-plaintext highlighter-rouge">x * sigmoid(x)</code> as the previous step.</p>
+
+<p>Second commit https://github.com/pytorch/xla/pull/2721/commits/c16fedbbee3662d3470629dc7fff51c63dd60855</p>
+
+<p>It shows how to add an op that will be used as a node in the generated graph for the operation.</p>
+
+<ol>
+  <li>It adds the operation to <code class="language-plaintext highlighter-rouge">ops.h/cpp</code>
+</li>
+  <li>It converts from tensors to XLA tensors and back.</li>
+  <li>It reuses at this level the implementation of SiLU (which is valid because you have already named the node at this level) which is <code class="language-plaintext highlighter-rouge">node.ReturnOp(xla_input * BuildSigmoid(xla_input), loctx)</code> and provides a “name” for the node with <code class="language-plaintext highlighter-rouge">GenericOp(OpKind(at::aten::silu), {input}, input.shape(), std::move(lower_fn))</code>.</li>
+</ol>
+
+<p>My first approach was to repeat all so I duplicated the <a href="https://github.com/pytorch/xla/blob/3eaee46ef679cc6a0f1f694bd0a007dbfd09c51b/torch_xla/csrc/elementwise.cpp#L176-L181">sigmoid implemented</a> in <code class="language-plaintext highlighter-rouge">elementwise.h/cpp</code>  and used that but the review of the PR suggested that I can call sigmoid because the node was already a <code class="language-plaintext highlighter-rouge">SiLU</code> so it doesn’t matter if I reused what was already there at that moment. I corrected with an amended and just reused Sigmoid instead of my SiLU in elementwise, making the commit writes 2 less files than amended commit.</p>
+
+<h2 id="the-backward-pass">
+<a class="anchor" href="#the-backward-pass" aria-hidden="true"><span class="octicon octicon-link"></span></a>The backward pass</h2>
+
+<p>This operation didn’t include a backward pass, you should implement it if the header contains the forward and the backward pass, this was more a <code class="language-plaintext highlighter-rouge">_out</code> operation that is also used for in place methods.</p>
+
+<p>Note: I haven’t seen how this <em>dispatch</em> works, but I guess works like <em>simple inheritance</em>, when <code class="language-plaintext highlighter-rouge">aten_xla_type</code> don’t provide the method then the ones from <code class="language-plaintext highlighter-rouge">aten_xla_type_default</code> are used (which is the CPU implementations and <em>fallbacks</em>). But see that the type <code class="language-plaintext highlighter-rouge">AtenXlaType</code> is not a <code class="language-plaintext highlighter-rouge">subclass</code> <a href="https://github.com/pytorch/xla/blob/master/torch_xla/csrc/aten_xla_type.cpp#L26-L30">aten_xla_type</a>”</p>
+
+<p>“Also note that <code class="language-plaintext highlighter-rouge">aten_xla_type_default</code> which is auto generated after build in some stage because it is not in repo and is ignored in <code class="language-plaintext highlighter-rouge">.gitignore</code>. So it should be other type of <code class="language-plaintext highlighter-rouge">dynamic dispatching</code> somewhere <em>deep in the code</em>.</p>
+
+<h1 id="conclusion">
+<a class="anchor" href="#conclusion" aria-hidden="true"><span class="octicon octicon-link"></span></a>Conclusion</h1>
+
+<p>Lowering an op is difficult, but practice does help and easy tasks does too. You also need to provide a test case, which probably is just to take a template from a previous one (because test from CPU pytorch are used as base).</p>
+
+<p>There are different things you need to know at less a little: pytorch, XLA, C++ (to see how the default operation is implemented), even some cuda if you can read that and take it as reference apart from the default CPU implementations and “cpu_fallback” (which I still don’t know how they differ from CPU implementations or when they are used).</p>
+
+<p>Hopefully this little explanation will help another person who wants to contribute lowering ops and understand a little better what is explained on the op lowering guide.</p>
+
+  </div><a class="u-url" href="/blog/xla/2021/01/24/op_lowering_pythorchXLA.html" hidden></a>
+</article>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/blog/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/blog/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/blog/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p>¡A volar!</p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/tyoc213" title="tyoc213"><svg class="svg-icon grey"><use xlink:href="/blog/assets/minima-social-icons.svg#github"></use></svg></a></li><li><a rel="me" href="https://twitter.com/tyoc213" title="tyoc213"><svg class="svg-icon grey"><use xlink:href="/blog/assets/minima-social-icons.svg#twitter"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
