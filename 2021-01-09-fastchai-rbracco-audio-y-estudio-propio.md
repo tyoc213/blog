@@ -3,6 +3,7 @@ toc: true
 layout: post
 description: Audio y estudio autodidacta
 categories: [fastchai, fastai]
+comments: true
 title: Audio y auto estudio interview
 ---
 

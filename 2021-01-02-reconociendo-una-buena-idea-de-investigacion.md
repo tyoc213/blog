@@ -3,6 +3,7 @@ toc: true
 layout: post
 description: 
 categories: [note]
+comments: true
 title: ¿Cómo reconocer las buenas ideas de investigación que valen tu tiempo y esfuerzo?
 ---
 

@@ -3,6 +3,7 @@ toc: true
 layout: post
 description: Lowering SiLU operation in Pytorch/XLA
 categories: [xla]
+comments: true
 title: Lowering SiLU in pytorch/XLA
 ---
 
