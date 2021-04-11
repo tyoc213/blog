@@ -250,7 +250,7 @@ export CC=clang-8
 export GLIBCXX_USE_CXX11_ABI=0
 export CFLAGS="${CFLAGS} -D_GLIBCXX_USE_CXX11_ABI=0"
 export CXXFLAGS="${CXXFLAGS} -D_GLIBCXX_USE_CXX11_ABI=0"
-export PATH=/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/go/bin:/home/tyoc213/go/bin:$PATH</code></pre>
+export PATH=/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/go/bin:/home/tyoc213/go/bin:/home/tyoc213/miniconda3/envs/xla/include:$PATH</code></pre>
 <p>Probably some of them are not needed, but this worked out. Also this is not all that is needed, there is one extra set of commands needed because if not the lib will mix CXX11_ABI so it will not link (and you will not know after hours). To apply this inside the <code>pytorch</code> directory:</p>
 
 <pre><code>sed -i '/include(CMakeDependentOption)/i set(GLIBCXX_USE_CXX11_ABI 0)' CMakeLists.txt
