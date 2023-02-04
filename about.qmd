@@ -1,0 +1,15 @@
+---
+title: "About"
+image: profile.jpg
+about:
+  template: jolla
+  links:
+    - icon: github
+      text: Github
+      href: https://github.com/tyoc213
+    - icon: twitter
+      text: tyoc213
+      href: https://twitter.com/tyoc213
+---
+
+About this blog
