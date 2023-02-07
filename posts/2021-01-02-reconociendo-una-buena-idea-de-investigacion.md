@@ -1,10 +1,14 @@
 ---
-toc: true
+aliases:
+- /fastchai/fastai/2021/01/02/reconociendo-una-buena-idea-de-investigacion
+categories:
+- note
+date: '2021-01-02'
+description: Cómo reconocer las buenas ideas de investigación
 layout: post
-description: 
-categories: [note]
-comments: true
 title: ¿Cómo reconocer las buenas ideas de investigación que valen tu tiempo y esfuerzo?
+toc: true
+
 ---
 
 

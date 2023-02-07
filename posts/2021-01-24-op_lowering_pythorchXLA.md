@@ -1,12 +1,15 @@
 ---
-toc: true
-layout: post
+aliases:
+- /xla/2021/01/24/op_lowering_pythorchXLA
+categories:
+- xla
+date: '2021-01-24'
 description: Lowering SiLU operation in Pytorch/XLA
-categories: [xla]
-comments: true
+layout: post
 title: Lowering SiLU in pytorch/XLA
----
+toc: true
 
+---
 
 # Introduction
 

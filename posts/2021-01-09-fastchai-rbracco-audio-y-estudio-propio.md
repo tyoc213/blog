@@ -1,10 +1,15 @@
 ---
-toc: true
-layout: post
+aliases:
+- /fastchai/fastai/2021/01/09/fastchai-rbracco-audio-y-estudio-propio
+categories:
+- fastchai
+- fastai
+date: '2021-01-09'
 description: Audio y estudio autodidacta
-categories: [fastchai, fastai]
-comments: true
+layout: post
 title: Audio y auto estudio interview
+toc: true
+
 ---
 
 {% twitter https://twitter.com/bhutanisanyam1/status/1168218396552351744 %}
