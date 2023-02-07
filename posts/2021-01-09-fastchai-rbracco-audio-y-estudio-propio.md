@@ -12,7 +12,7 @@ toc: true
 
 ---
 
-{% twitter https://twitter.com/bhutanisanyam1/status/1168218396552351744 %}
+<blockquote class="twitter-tweet" data-dnt="true" data-theme="dark"><p lang="en" dir="ltr">Here&#39;s my interview with Robbert Bracco <a href="https://twitter.com/MadeUpMasters?ref_src=twsrc%5Etfw">@MadeUpMasters</a> (author of &quot;Things Jeremy Says to do&quot; on the <a href="https://twitter.com/fastdotai?ref_src=twsrc%5Etfw">@fastdotai</a> forums) all about deep learning and <a href="https://t.co/wANZD5nFcn">https://t.co/wANZD5nFcn</a> (library) applied to audio, self-study in ML.<br>Audio: <a href="https://t.co/T9CeIBtUKr">https://t.co/T9CeIBtUKr</a><br><br>Video: <a href="https://t.co/ZCJzuxCIwG">https://t.co/ZCJzuxCIwG</a></p>&mdash; Sanyam Bhutani (@bhutanisanyam1) <a href="https://twitter.com/bhutanisanyam1/status/1168218396552351744?ref_src=twsrc%5Etfw">September 1, 2019</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script> 
 
 # Parte 1
 https://youtu.be/k-gZAyg5ib8?t=0 Introducción
