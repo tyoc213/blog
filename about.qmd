@@ -12,4 +12,14 @@ about:
       href: https://twitter.com/tyoc213
 ---
 
-About this blog
+I'm a developer that has been exploring all types of applications from: native mobile on C++/Android/iOS and crossplatform to backends in different languages doing custom apps, financial apps or core banking services.
+
+I have always liked:
+
+* OS
+* Language R&D
+* Games
+* Artifial intelligence
+* Bioinformatics
+
+And in this blog I rant or write on Español o English.
