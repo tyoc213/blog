@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.335">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="dcterms.date" content="2020-09-26">
+<meta name="description" content="A tutorial of fastpages for Jupyter notebooks.">
+
+<title>tyoc213 blog’s - librosa 2015 presentation updated calls</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="../styles.css">
+</head>
+
+<body class="nav-fixed fullcontent">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">tyoc213 blog’s</span>
+    </a>
+  </div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../about.html">
+ <span class="menu-text">tyoc213 blog’s</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/"><i class="bi bi-github" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com"><i class="bi bi-twitter" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+</ul>
+              <div id="quarto-search" class="" title="Search"></div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">librosa 2015 presentation updated calls</h1>
+                  <div>
+        <div class="description">
+          A tutorial of fastpages for Jupyter notebooks.
+        </div>
+      </div>
+                </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">September 26, 2020</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+<p>From https://www.youtube.com/watch?v=MhOdbtPhbLU in 2015</p>
+<p>I also copy &amp; paste some captures (they look weird) to see how different it was 5 years a go.</p>
+<div class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>matplotlib inline</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>seaborn.<span class="bu">set</span>(style<span class="op">=</span><span class="st">'ticks'</span>)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> IPython.display <span class="im">import</span> Audio</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> scipy</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> mir_eval</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> librosa</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> librosa.display</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>y,sr <span class="op">=</span> librosa.load(librosa.util.example_audio_file())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="callout-important callout callout-style-default callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>I removed all the outputs of Audio(data=,rate=) because the notebook was more than 19Mb total</p>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>Audio(data<span class="op">=</span>y,rate<span class="op">=</span>sr) <span class="co"># cleaned just to lower size of notebook (run again to see embeded player)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="waveform" class="level3">
+<h3 class="anchored" data-anchor-id="waveform">waveform</h3>
+<div class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>librosa.display.waveplot(y, sr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="4">
+<pre><code>&lt;matplotlib.collections.PolyCollection at 0x7fcb930f68b0&gt;</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="2020-09-26-Librosa-2015-presentation-updated-calls_files/figure-html/cell-5-output-2.png" class="img-fluid"></p>
+</div>
+</div>
+</section>
+<section id="spectrograms" class="level3">
+<h3 class="anchored" data-anchor-id="spectrograms">spectrograms</h3>
+<div class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>D <span class="op">=</span> librosa.stft(y)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>D.shape</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="5">
+<pre><code>(1025, 2647)</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>log_spectrogram <span class="op">=</span> librosa.power_to_db(D<span class="op">**</span><span class="dv">2</span>, ref<span class="op">=</span>np.<span class="bu">max</span>)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>log_spectrogram.shape</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>/home/tyoc213/miniconda3/envs/fastai/lib/python3.8/site-packages/librosa/core/spectrum.py:1544: UserWarning: power_to_db was called on complex input so phase information will be discarded. To suppress this warning, call power_to_db(np.abs(D)**2) instead.
+  warnings.warn(</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="6">
+<pre><code>(1025, 2647)</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>librosa.display.specshow(log_spectrogram, x_axis<span class="op">=</span><span class="st">'time'</span>, y_axis<span class="op">=</span><span class="st">'linear'</span>)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>plt.colorbar()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="7">
+<pre><code>&lt;matplotlib.colorbar.Colorbar at 0x7fcb93009370&gt;</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="2020-09-26-Librosa-2015-presentation-updated-calls_files/figure-html/cell-8-output-2.png" class="img-fluid"></p>
+</div>
+</div>
+<div class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>librosa.display.specshow(log_spectrogram, x_axis<span class="op">=</span><span class="st">'time'</span>, y_axis<span class="op">=</span><span class="st">'log'</span>)</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>plt.colorbar()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>/home/tyoc213/miniconda3/envs/fastai/lib/python3.8/site-packages/librosa/display.py:974: MatplotlibDeprecationWarning: The 'basey' parameter of __init__() has been renamed 'base' since Matplotlib 3.3; support for the old name will be dropped two minor releases later.
+  scaler(mode, **kwargs)
+/home/tyoc213/miniconda3/envs/fastai/lib/python3.8/site-packages/librosa/display.py:974: MatplotlibDeprecationWarning: The 'linthreshy' parameter of __init__() has been renamed 'linthresh' since Matplotlib 3.3; support for the old name will be dropped two minor releases later.
+  scaler(mode, **kwargs)
+/home/tyoc213/miniconda3/envs/fastai/lib/python3.8/site-packages/librosa/display.py:974: MatplotlibDeprecationWarning: The 'linscaley' parameter of __init__() has been renamed 'linscale' since Matplotlib 3.3; support for the old name will be dropped two minor releases later.
+  scaler(mode, **kwargs)</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="8">
+<pre><code>&lt;matplotlib.colorbar.Colorbar at 0x7fcb92f4e0a0&gt;</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="2020-09-26-Librosa-2015-presentation-updated-calls_files/figure-html/cell-9-output-3.png" class="img-fluid"></p>
+</div>
+</div>
+</section>
+<section id="constant-q-transform" class="level3">
+<h3 class="anchored" data-anchor-id="constant-q-transform">Constant q transform</h3>
+<p>direct log-frecuency analysis?</p>
+<div class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>C <span class="op">=</span> librosa.cqt(y, sr)</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>C.shape</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="9">
+<pre><code>(84, 2647)</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>librosa.display.specshow(librosa.amplitude_to_db(C<span class="op">**</span><span class="dv">2</span>), x_axis<span class="op">=</span><span class="st">'time'</span>, y_axis<span class="op">=</span><span class="st">'cqt_hz'</span>)</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>plt.colorbar()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>/home/tyoc213/miniconda3/envs/fastai/lib/python3.8/site-packages/librosa/core/spectrum.py:1641: UserWarning: amplitude_to_db was called on complex input so phase information will be discarded. To suppress this warning, call amplitude_to_db(np.abs(S)) instead.
+  warnings.warn(</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="10">
+<pre><code>&lt;matplotlib.colorbar.Colorbar at 0x7fcb92e887c0&gt;</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="2020-09-26-Librosa-2015-presentation-updated-calls_files/figure-html/cell-11-output-3.png" class="img-fluid"></p>
+</div>
+</div>
+<p><img alt="TK: add title" width="774" caption="TK: add title" id="TK: add it" src="images/att_00000.png"></p>
+<div class="cell" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>librosa.display.specshow(librosa.amplitude_to_db(C<span class="op">**</span><span class="dv">2</span>, top_db<span class="op">=</span><span class="dv">40</span>), x_axis<span class="op">=</span><span class="st">'time'</span>, y_axis<span class="op">=</span><span class="st">'cqt_note'</span>)</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>plt.colorbar()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="11">
+<pre><code>&lt;matplotlib.colorbar.Colorbar at 0x7fcb92d0f0d0&gt;</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="2020-09-26-Librosa-2015-presentation-updated-calls_files/figure-html/cell-12-output-2.png" class="img-fluid"></p>
+</div>
+</div>
+<p><img alt="TK: add title" width="737" caption="TK: add title" id="TK: add it" src="images/att_00001.png"></p>
+</section>
+<section id="spectral-features" class="level3">
+<h3 class="anchored" data-anchor-id="spectral-features">Spectral features</h3>
+<p>Spectral features are often used to analyze harmony or timbre.</p>
+<p>Usually the product of a spectrogram and a filter bank.</p>
+</section>
+<section id="pitch-vs-class" class="level3">
+<h3 class="anchored" data-anchor-id="pitch-vs-class">pitch vs class</h3>
+<p>CQT measures the energy in each pitch.</p>
+<p>Chroma measures the energy in each pitch class.</p>
+<div class="cell" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>chroma <span class="op">=</span> librosa.feature.chroma_cqt(C<span class="op">=</span>C, sr<span class="op">=</span>sr)</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>chroma.shape</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="12">
+<pre><code>(12, 2647)</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>librosa.display.specshow(chroma, x_axis<span class="op">=</span><span class="st">'time'</span>, y_axis<span class="op">=</span><span class="st">'chroma'</span>)</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>plt.colorbar()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>/home/tyoc213/miniconda3/envs/fastai/lib/python3.8/site-packages/librosa/display.py:822: UserWarning: Trying to display complex-valued input. Showing magnitude instead.
+  warnings.warn(</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="13">
+<pre><code>&lt;matplotlib.colorbar.Colorbar at 0x7fcb906852b0&gt;</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="2020-09-26-Librosa-2015-presentation-updated-calls_files/figure-html/cell-14-output-3.png" class="img-fluid"></p>
+</div>
+</div>
+<p><img alt="TK: add title" width="715" caption="TK: add title" id="TK: add it" src="images/att_00002.png"></p>
+<p>Other spectral features includes MEL spectra, MFCC and Tonnetz</p>
+<div class="cell" data-execution_count="14">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>M <span class="op">=</span> librosa.feature.melspectrogram(y<span class="op">=</span>y, sr<span class="op">=</span>sr)</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>MFCC <span class="op">=</span> librosa.feature.mfcc(y<span class="op">=</span>y, sr<span class="op">=</span>sr)</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>tonnetz <span class="op">=</span> librosa.feature.tonnetz(y<span class="op">=</span>y, sr<span class="op">=</span>sr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="audio-effects" class="level3">
+<h3 class="anchored" data-anchor-id="audio-effects">Audio effects</h3>
+<div class="cell" data-execution_count="15">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>y_harmonic, y_percussive <span class="op">=</span> librosa.effects.hpss(y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>Audio(data<span class="op">=</span>y, rate<span class="op">=</span>sr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>Audio(data<span class="op">=</span>y_harmonic, rate<span class="op">=</span>sr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>Audio(data<span class="op">=</span>y_percussive, rate<span class="op">=</span>sr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="19">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">12</span>,<span class="dv">6</span>))</span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>C_harmonic <span class="op">=</span> librosa.cqt(y_harmonic, sr)</span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>C_perc <span class="op">=</span> librosa.cqt(y_percussive, sr)</span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>plt.subplot(<span class="dv">3</span>,<span class="dv">1</span>,<span class="dv">1</span>), librosa.display.specshow(C<span class="op">**</span>(<span class="fl">1.</span><span class="op">/</span><span class="dv">3</span>), y_axis<span class="op">=</span><span class="st">'cqt_hz'</span>), plt.colorbar()</span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>plt.subplot(<span class="dv">3</span>,<span class="dv">1</span>,<span class="dv">2</span>), librosa.display.specshow(C_harmonic<span class="op">**</span>(<span class="fl">1.</span><span class="op">/</span><span class="dv">3</span>), y_axis<span class="op">=</span><span class="st">'cqt_hz'</span>), plt.colorbar()</span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a>plt.subplot(<span class="dv">3</span>,<span class="dv">1</span>,<span class="dv">3</span>), librosa.display.specshow(C_perc<span class="op">**</span>(<span class="fl">1.</span><span class="op">/</span><span class="dv">3</span>), y_axis<span class="op">=</span><span class="st">'cqt_hz'</span>), plt.colorbar()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="19">
+<pre><code>(&lt;AxesSubplot:ylabel='Hz'&gt;,
+ &lt;matplotlib.collections.QuadMesh at 0x7fcb92d88d90&gt;,
+ &lt;matplotlib.colorbar.Colorbar at 0x7fcb92df3a00&gt;)</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="2020-09-26-Librosa-2015-presentation-updated-calls_files/figure-html/cell-20-output-2.png" class="img-fluid"></p>
+</div>
+</div>
+</section>
+<section id="onsets-and-beats" class="level3">
+<h3 class="anchored" data-anchor-id="onsets-and-beats">Onsets and beats</h3>
+<div class="cell" data-execution_count="20">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>onset_envelope <span class="op">=</span> librosa.onset.onset_strength(y, sr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="21">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>onsets <span class="op">=</span> librosa.onset.onset_detect(onset_envelope<span class="op">=</span>onset_envelope)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="22">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>plt.subplot(<span class="dv">2</span>,<span class="dv">1</span>,<span class="dv">1</span>)</span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>plt.plot(onset_envelope, label<span class="op">=</span><span class="st">'Onset strength'</span>)</span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>plt.vlines(onsets, <span class="dv">0</span>, onset_envelope.<span class="bu">max</span>(), color<span class="op">=</span><span class="st">'r'</span>, alpha<span class="op">=</span><span class="fl">0.25</span>, label<span class="op">=</span><span class="st">'onsets'</span>)</span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>plt.xticks([]), plt.yticks([])</span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>plt.legend(frameon<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>plt.axis(<span class="st">'tight'</span>)</span>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a>plt.subplot(<span class="dv">2</span>,<span class="dv">1</span>,<span class="dv">2</span>)</span>
+<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a>librosa.display.waveplot(y, sr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="22">
+<pre><code>&lt;matplotlib.collections.PolyCollection at 0x7fcb93b6a220&gt;</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="2020-09-26-Librosa-2015-presentation-updated-calls_files/figure-html/cell-23-output-2.png" class="img-fluid"></p>
+</div>
+</div>
+<p>onset stregth is used to track beats and estimate tempo</p>
+<div class="cell" data-execution_count="23">
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>tempo, beats <span class="op">=</span> librosa.beat.beat_track(onset_envelope<span class="op">=</span>onset_envelope)</span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>tempo, beats</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="23">
+<pre><code>(129.19921875,
+ array([   4,   23,   43,   63,   83,  102,  122,  142,  162,  181,  202,
+         222,  242,  261,  281,  301,  321,  341,  361,  382,  401,  421,
+         441,  461,  480,  500,  520,  540,  560,  579,  600,  620,  639,
+         658,  678,  698,  718,  737,  757,  777,  798,  817,  837,  857,
+         877,  896,  916,  936,  957,  976,  996, 1016, 1036, 1055, 1075,
+        1095, 1116, 1135, 1155, 1175, 1195, 1214, 1234, 1254, 1275, 1294,
+        1314, 1334, 1354, 1373, 1393, 1413, 1434, 1453, 1473, 1493, 1513,
+        1532, 1552, 1572, 1593, 1612, 1632, 1652, 1672, 1691, 1712, 1732,
+        1752, 1771, 1791, 1811, 1831, 1850, 1870, 1890, 1911, 1931, 1951,
+        1971, 1990, 2010, 2030, 2050, 2070, 2090, 2110, 2130, 2149, 2169,
+        2189, 2209, 2229, 2249, 2269, 2288, 2308, 2328, 2348, 2368, 2388,
+        2408, 2428, 2448, 2467, 2487, 2507, 2527, 2547]))</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="24">
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>plt.plot(onset_envelope, label<span class="op">=</span><span class="st">'Onset strength'</span>)</span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>plt.vlines(onsets, <span class="dv">0</span>, onset_envelope.<span class="bu">max</span>(), color<span class="op">=</span><span class="st">'r'</span>, alpha<span class="op">=</span><span class="fl">0.25</span>, label<span class="op">=</span><span class="st">'onsets'</span>)</span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>plt.xticks([]), plt.yticks([])</span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>plt.legend(frameon<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>plt.axis(<span class="st">'tight'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="24">
+<pre><code>(-132.3, 2778.3, -0.05, 1.05)</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="2020-09-26-Librosa-2015-presentation-updated-calls_files/figure-html/cell-25-output-2.png" class="img-fluid"></p>
+</div>
+</div>
+<p>beat events are in frame indices</p>
+<p>We can convert to time (in seconds), and sonify with mir_eval</p>
+<div class="cell" data-execution_count="25">
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>beat_times <span class="op">=</span> librosa.frames_to_time(beats)</span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>beat_times</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="25">
+<pre><code>array([ 0.09287982,  0.53405896,  0.99845805,  1.46285714,  1.92725624,
+        2.36843537,  2.83283447,  3.29723356,  3.76163265,  4.20281179,
+        4.69043084,  5.15482993,  5.61922902,  6.06040816,  6.52480726,
+        6.98920635,  7.45360544,  7.91800454,  8.38240363,  8.87002268,
+        9.31120181,  9.77560091, 10.24      , 10.70439909, 11.14557823,
+       11.60997732, 12.07437642, 12.53877551, 13.0031746 , 13.44435374,
+       13.93197279, 14.39637188, 14.83755102, 15.27873016, 15.74312925,
+       16.20752834, 16.67192744, 17.11310658, 17.57750567, 18.04190476,
+       18.52952381, 18.97070295, 19.43510204, 19.89950113, 20.36390023,
+       20.80507937, 21.26947846, 21.73387755, 22.2214966 , 22.66267574,
+       23.12707483, 23.59147392, 24.05587302, 24.49705215, 24.96145125,
+       25.42585034, 25.91346939, 26.35464853, 26.81904762, 27.28344671,
+       27.7478458 , 28.18902494, 28.65342404, 29.11782313, 29.60544218,
+       30.04662132, 30.51102041, 30.9754195 , 31.43981859, 31.88099773,
+       32.34539683, 32.80979592, 33.29741497, 33.7385941 , 34.2029932 ,
+       34.66739229, 35.13179138, 35.57297052, 36.03736961, 36.50176871,
+       36.98938776, 37.43056689, 37.89496599, 38.35936508, 38.82376417,
+       39.26494331, 39.75256236, 40.21696145, 40.68136054, 41.12253968,
+       41.58693878, 42.05133787, 42.51573696, 42.9569161 , 43.42131519,
+       43.88571429, 44.37333333, 44.83773243, 45.30213152, 45.76653061,
+       46.20770975, 46.67210884, 47.13650794, 47.60090703, 48.06530612,
+       48.52970522, 48.99410431, 49.4585034 , 49.89968254, 50.36408163,
+       50.82848073, 51.29287982, 51.75727891, 52.221678  , 52.6860771 ,
+       53.12725624, 53.59165533, 54.05605442, 54.52045351, 54.98485261,
+       55.4492517 , 55.91365079, 56.37804989, 56.84244898, 57.28362812,
+       57.74802721, 58.2124263 , 58.6768254 , 59.14122449])</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>y_click <span class="op">=</span> mir_eval.sonify.clicks(beat_times, sr, length<span class="op">=</span><span class="bu">len</span>(y))</span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>Audio(data<span class="op">=</span>y<span class="op">+</span>y_click, rate<span class="op">=</span>sr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="temporal-structure" class="level3">
+<h3 class="anchored" data-anchor-id="temporal-structure">Temporal structure</h3>
+<div class="cell" data-execution_count="27">
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>c_sync <span class="op">=</span> librosa.util.sync(chroma, beats, aggregate<span class="op">=</span>np.median)</span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>c_sync.shape</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="27">
+<pre><code>(12, 130)</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="28">
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a>librosa.display.specshow(c_sync, y_axis<span class="op">=</span><span class="st">'chroma'</span>)</span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a>plt.colorbar()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>/home/tyoc213/miniconda3/envs/fastai/lib/python3.8/site-packages/librosa/display.py:822: UserWarning: Trying to display complex-valued input. Showing magnitude instead.
+  warnings.warn(</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="28">
+<pre><code>&lt;matplotlib.colorbar.Colorbar at 0x7fcb904d6100&gt;</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="2020-09-26-Librosa-2015-presentation-updated-calls_files/figure-html/cell-29-output-3.png" class="img-fluid"></p>
+</div>
+</div>
+</section>
+<section id="history-embedding-can-add-context" class="level3">
+<h3 class="anchored" data-anchor-id="history-embedding-can-add-context">history embedding can add context</h3>
+<div class="cell" data-execution_count="29">
+<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a>chroma_stack <span class="op">=</span> librosa.feature.stack_memory(c_sync, n_steps<span class="op">=</span><span class="dv">3</span>, mode<span class="op">=</span><span class="st">'edge'</span>)</span>
+<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a>chroma_stack.shape</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="29">
+<pre><code>(36, 130)</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="30">
+<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a>librosa.display.specshow(chroma_stack, y_axis<span class="op">=</span><span class="st">'chroma'</span>)</span>
+<span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a>plt.colorbar()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="30">
+<pre><code>&lt;matplotlib.colorbar.Colorbar at 0x7fcb903be0d0&gt;</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="2020-09-26-Librosa-2015-presentation-updated-calls_files/figure-html/cell-31-output-2.png" class="img-fluid"></p>
+</div>
+</div>
+</section>
+<section id="recurrence-plots-show-nearest-neighbor-linkage-for-each-frame." class="level3">
+<h3 class="anchored" data-anchor-id="recurrence-plots-show-nearest-neighbor-linkage-for-each-frame.">recurrence plots show nearest neighbor linkage for each frame.</h3>
+<p>Chroma recurrence can encode harmonic repetitions</p>
+<div class="cell" data-execution_count="31">
+<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="co"># cant run this cell, it eats up 32 Gb physical memory + 37 Gb of swap on my Linux</span></span>
+<span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a><span class="co"># R = librosa.segment.recurrence_matrix(y, sym=True)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="32">
+<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="co">#R = librosa.segment.recurrence_matrix(y, sym=True)</span></span>
+<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a><span class="co">#R = librosa.segment.recurrence_matrix(chroma_stack, sym=True)</span></span>
+<span id="cb56-3"><a href="#cb56-3" aria-hidden="true" tabindex="-1"></a><span class="co"># diagonal lines indicate repeated progressions</span></span>
+<span id="cb56-4"><a href="#cb56-4" aria-hidden="true" tabindex="-1"></a><span class="co"># librosa.display.specshow(R, aspect='equal')</span></span>
+<span id="cb56-5"><a href="#cb56-5" aria-hidden="true" tabindex="-1"></a><span class="co"># post processing R can reveal structural components, metrical structure, etc</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>How to plot the different <code>R</code>s above?</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.335">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="dcterms.date" content="2020-12-13">
+<meta name="description" content="follow up from having locally installed xla">
+
+<title>tyoc213 blog’s - Finding nemo a bug journey</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="../styles.css">
+</head>
+
+<body class="nav-fixed fullcontent">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">tyoc213 blog’s</span>
+    </a>
+  </div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../about.html">
+ <span class="menu-text">tyoc213 blog’s</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/"><i class="bi bi-github" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com"><i class="bi bi-twitter" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+</ul>
+              <div id="quarto-search" class="" title="Search"></div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Finding nemo a bug journey</h1>
+                  <div>
+        <div class="description">
+          follow up from having locally installed xla
+        </div>
+      </div>
+                </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">December 13, 2020</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+<section id="what-happened-at-first" class="level1">
+<h1>What happened at first</h1>
+<p>The major part of the last months we were trying to solve one bug that we didn’t know how to solve until this days, some time before fastai version 2 release having a POC and passing the hackathon we participated we left a little the project, but when we came back to it, there were some extrange things happening, some models where not training and apparently others where training, we didn’t understand what happened, in that time we thought we introduced an error in our code some way.</p>
+<section id="the-journey" class="level2">
+<h2 class="anchored" data-anchor-id="the-journey">The journey</h2>
+<p>So, these last few days since I had locally installed XLA and been able to run things, I planned to take a new round to find our bug and it was a perfect opportunity to test what having locally installed <code>pytorch</code>+<code>xla</code>+<code>fatai_xla_etensions</code> could do.</p>
+<p>So I passed a lot of assumptions to finally find the solution.</p>
+<ol start="0" type="1">
+<li>So after having locally installed XLA, one of the first things I wanted to test is if locally I could reproduce the error, and I could!</li>
+<li>The first one was that the error was in our code, but having locally XLA allowed me to test the exact same code changing the device to either: CPU, CUDA or XLA. So I ended up having 2 data loaders and 2 trains on the same python file. Also one main point was that I wrapped a Adam but from pytorch with <code>OptimWrapper</code> and it trained correctly so I was more suspicious of differences between the optimizer from fastai and the native to pytorch because there is one know difference about <code>__getstate__</code> that is also a requirement for TPU Pods.</li>
+<li>In the past we have also thought that it was a freeze unfreeze problem, but it was also discarded, so this time I was checking the optimizer, but could not find why the params were not training even when looking under the lens.</li>
+<li>But after more testings and so on, I see that the second example started to train correctly while the first on the file not, and it was that with all the fresh runs, so I thought it was a problem with the learner, but could not find a “real problem” so I returned back to the optimizer and all, but this time I have a new “tool” I learned, counting the trainable parameters so, the trainable parameters their gradients are updated when you call <code>backward</code>, so I started to count there and for the first example they where <strong>always zero</strong> while for the second run since start, they have a number. So the next task was to find why on the first the trainable parameters are always zero and the second not.</li>
+</ol>
+<p>But I still didn’t get why one model was training and the other one not!</p>
+<p>I passed <code>_BaseOptimizer</code>, <code>Optimizer</code>, <code>Learner</code> and others and still could not find the problem, so I decided to compare models and found the problem! I updated the example I found in pytorch forums https://discuss.pytorch.org/t/two-models-with-same-weights-different-results/8918/7 the original one at first run did break because it compared tensors not on same device, so it threw error, I modified it so that it prints them nicely instead of being caught in that error.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> compare_models(model_1, model_2):</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    models_differ <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> key_item_1, key_item_2 <span class="kw">in</span> <span class="bu">zip</span>(model_1.state_dict().items(), model_2.state_dict().items()):</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> key_item_1[<span class="dv">1</span>].device <span class="op">==</span> key_item_2[<span class="dv">1</span>].device  <span class="kw">and</span> torch.equal(key_item_1[<span class="dv">1</span>], key_item_2[<span class="dv">1</span>]):</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>            <span class="cf">pass</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>            models_differ <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> (key_item_1[<span class="dv">0</span>] <span class="op">==</span> key_item_2[<span class="dv">0</span>]):</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>                _device <span class="op">=</span> <span class="ss">f'device </span><span class="sc">{</span>key_item_1[<span class="dv">1</span>]<span class="sc">.</span>device<span class="sc">}</span><span class="ss">, </span><span class="sc">{</span>key_item_2[<span class="dv">1</span>]<span class="sc">.</span>device<span class="sc">}</span><span class="ss">'</span> <span class="cf">if</span> key_item_1[<span class="dv">1</span>].device <span class="op">!=</span> key_item_2[<span class="dv">1</span>].device <span class="cf">else</span> <span class="st">''</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>                <span class="bu">print</span>(<span class="ss">f'Mismatch </span><span class="sc">{</span>_device<span class="sc">}</span><span class="ss"> found at'</span>, key_item_1[<span class="dv">0</span>])</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>            <span class="cf">else</span>:</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>                <span class="cf">raise</span> <span class="pp">Exception</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> models_differ <span class="op">==</span> <span class="dv">0</span>:</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">'Models match perfectly! :)'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>And that was the solution to the problem, I focused on seeing why the models parameters were on different devices. At the end I have something like (remember I don’t need to patch the optimizer because I have all installed locally).</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> create_opt(<span class="va">self</span>):</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">'trainable count before'</span>, <span class="bu">len</span>(<span class="va">self</span>.all_params(with_grad<span class="op">=</span><span class="va">True</span>)))</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">self</span>.opt <span class="op">=</span> <span class="va">self</span>.opt_func(<span class="va">self</span>.splitter(<span class="va">self</span>.model), lr<span class="op">=</span><span class="va">self</span>.lr)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">'trainable count after'</span>, <span class="bu">len</span>(<span class="va">self</span>.all_params(with_grad<span class="op">=</span><span class="va">True</span>)))</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">not</span> <span class="va">self</span>.wd_bn_bias:</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> p <span class="kw">in</span> <span class="va">self</span>._bn_bias_state(<span class="va">True</span> ): p[<span class="st">'do_wd'</span>] <span class="op">=</span> <span class="va">False</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="va">self</span>.train_bn:</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> p <span class="kw">in</span> <span class="va">self</span>._bn_bias_state(<span class="va">False</span>): p[<span class="st">'force_train'</span>] <span class="op">=</span> <span class="va">True</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>and</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">'trainable count before backward'</span>, <span class="bu">len</span>(<span class="va">self</span>.all_params(with_grad<span class="op">=</span><span class="va">True</span>)))</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>(<span class="st">'before_backward'</span>)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">'trainable count before backward'</span>, <span class="bu">len</span>(<span class="va">self</span>.all_params(with_grad<span class="op">=</span><span class="va">True</span>)))</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>._backward()</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>(<span class="st">'after_backward'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>So at the end I see that even that the model is moved later to the device, the first time when <code>splitter=trainable_params</code> in <code>self.opt = self.opt_func(self.splitter(self.model), lr=self.lr)</code> inside <code>create_opt</code> it is not there, so the parameters where stuck on CPU while the the data and the model is later moved to the XLA device.</p>
+<p>This does not affects GPUs, but thinking about it could mean also something about the pickable behaviour of xla tensors, specially the optimizer, but that is an history for another time, right now, we have again a simple lib that works for <code>Single-device TPUs</code> where you need to modify zero code from fastai.</p>
+</section>
+<section id="conclusion" class="level2">
+<h2 class="anchored" data-anchor-id="conclusion">Conclusion</h2>
+<p>So the model need to be in TPU/XLA device before their parameters are taked by splitter on <code>Optimizer</code> initialization, I guess we assumed some things in between then and now. At the end it was not exactly an error but was. But sure it was difficult to track, now knowing what it is is solved and we can continue forward.</p>
+<p>I hope to add in the next release a <code>show_lowering_ops</code> (or similar) to print the counters if you have hit some of those and it is easy to print in a model that runs with this activated. The <a href="https://github.com/butchland/fastai_xla_extensions/blob/master/samples/MNIST_TPU_demo.ipynb">MNIST demo</a> should be working again don’t forget to peek at <a href="https://github.com/butchland/fastai_xla_extensions/">fastai_xla_extensions</a>.</p>
+<p>EXTRA NOTE: But there was error because XLA model on CPU not trained when updating backward from data operations on XLA device? well, now I think that XLA worked on TPU with model and data copied to TPU on first time but somehow our model got stuck on CPU so not trained, it became another model separate from the execution happening on TPU (I can think of pickable things, but that is unknown at the moment)</p>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

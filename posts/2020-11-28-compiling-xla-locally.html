@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.335">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="dcterms.date" content="2020-11-28">
+<meta name="description" content="tools and env vars needed to compile xla locally with GPU support">
+
+<title>tyoc213 blog’s - Compiling xla locally</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="../styles.css">
+</head>
+
+<body class="nav-fixed fullcontent">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">tyoc213 blog’s</span>
+    </a>
+  </div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../about.html">
+ <span class="menu-text">tyoc213 blog’s</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/"><i class="bi bi-github" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com"><i class="bi bi-twitter" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+</ul>
+              <div id="quarto-search" class="" title="Search"></div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Compiling xla locally</h1>
+                  <div>
+        <div class="description">
+          tools and env vars needed to compile xla locally with GPU support
+        </div>
+      </div>
+                </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">November 28, 2020</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+<section id="introduction" class="level1">
+<h1>Introduction</h1>
+<p>Since the time I found some issues mentioning GPU support https://github.com/pytorch/xla/ I was wondering when I could use it locally because a little group at fastai community have been trying to give support to fastai and hopefully being able to run locally would be useful for that end.</p>
+</section>
+<section id="running-gpu-support-with-a-docker-image" class="level1">
+<h1>Running GPU support with a docker image</h1>
+<p>So the first thing was to run it with the docker image which if you have installed <a href="https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html">container-toolkit/install-guide</a> and then running something like <code>docker run --gpus all -it --shm-size 16G gcr.io/tpu-pytorch/xla@sha256:efe47b7a3875ddfa3ea9c68a12ed5517c19cbb3cf272776fba64bec8a683299f</code> or the sha or nightly you want to run like <code>gcr.io/tpu-pytorch/xla@nightly</code>.</p>
+<p>After I ran that, I compiled the source as <a href="https://github.com/pytorch/xla/blob/master/CONTRIBUTING.md">xla-instructions</a> inside that image and after some hours I could see a “hello” I have made on a cpp file <strong>wonderful!!!</strong>. But it seems that all that work would be lost on the next startup, so after watch building it and ran successfully I decided to give a go into building on my own computer (if you still need that then maybe check <code>docker commit xxxxx</code> and <code>docker checkpoint</code>).</p>
+</section>
+<section id="compiling-locally" class="level1">
+<h1>Compiling locally</h1>
+<p>To compile locally I have lurked and tested different ways, first time I build it was just with CPU support which I didn’t notice (some env vars where missing), so long history short I have made a new environment with conda like <code>conda create -n xla python=3.6</code> and worked inside this env.</p>
+<section id="installing-needed-things" class="level2">
+<h2 class="anchored" data-anchor-id="installing-needed-things">Installing needed things</h2>
+<p>Probably I miss something, but I have to install</p>
+<ul>
+<li>Don’t use the cuda from apt, use <a href="https://developer.nvidia.com/cuda-downloads">directly from nvidia</a> and install only sdk with <code>sudo sh PATH_CUDA_DRIVERS --silent --toolkit</code> it will be installed to <code>/usr/local/cuda</code> which is where it should be located (if you let Ubuntu handle installation of drivers this <code>--toolkit</code> will not erase that and only install sdk so when updating kernel no need to reinstall).</li>
+<li>Install <a href="https://docs.nvidia.com/deeplearning/cudnn/install-guide/index.html">cuddn from NVIDIA from zip</a> file and copy all h files and libs</li>
+</ul>
+<pre><code>sudo cp cuda/include/cudnn.h /usr/local/cuda/include
+sudo cp cuda/include/cudnn.h /usr/local/cuda/include
+sudo cp cuda/lib64/libcudnn* /usr/local/cuda/lib64
+sudo cp cuda/include/cudnn_version.h /usr/local/cuda/include
+sudo cp cuda/include/cudnn_backend.h /usr/local/cuda/include
+sudo cp cuda/include/cudnn_adv_infer.h /usr/local/cuda/include
+sudo cp cuda/include/cudnn_adv_train.h /usr/local/cuda/include
+sudo cp cuda/include/cudnn_cnn_infer.h /usr/local/cuda/include
+sudo cp cuda/include/cudnn_cnn_train.h /usr/local/cuda/include
+sudo cp cuda/include/cudnn_ops_infer.h /usr/local/cuda/include
+sudo cp cuda/include/cudnn_ops_train.h /usr/local/cuda/include
+sudo cp cuda/include/cudnn.h /usr/local/cuda/include</code></pre>
+<ul>
+<li>Install <code>sudo apt-get install cmake</code></li>
+<li><a href="https://golang.org/doc/install">Install go</a> to install <code>go get github.com/bazelbuild/bazelisk</code> and then make if you cant run <code>bazel</code> from command line make a <code>ln -s /home/tyoc213/go/bin/bazelisk /home/tyoc213/go/bin/bazel</code> because bazel is needed in the path.</li>
+<li><code>sudo apt-get install clang-8 clang++-8</code></li>
+<li><code>pip install lark-parser</code></li>
+<li><code>conda install -c pytorch magma-cuda110</code> In my case I have <code>CUDA Version: 11.0</code> so I used <code>110</code></li>
+</ul>
+</section>
+<section id="get-the-sources" class="level2">
+<h2 class="anchored" data-anchor-id="get-the-sources">Get the sources</h2>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone <span class="at">--recursive</span> https://github.com/pytorch/pytorch</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> pytorch/</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone <span class="at">--recursive</span> https://github.com/pytorch/xla.git</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> xla</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="ex">xla/scripts/apply_patches.sh</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>The last lines apply xla needed patches. Now you are ready to compile, but wait!!! what is missing is all the configuration that lets you build inside the docker container!</p>
+</section>
+<section id="environment-vars" class="level2">
+<h2 class="anchored" data-anchor-id="environment-vars">Environment vars</h2>
+<p>Which are the things I fighted most:</p>
+<pre><code>export CMAKE_PREFIX_PATH=${CONDA_PREFIX:-"$(dirname $(which conda))/../"}
+export TF_CUDA_COMPUTE_CAPABILITIES="7.0,7.5"
+export CXX_ABI=0
+export cxx_abi=0
+export GPU_NUM_DEVICES=1
+export cuda=1 # new
+export USE_CUDA=1
+export XLA_CUDA=1
+export XLA_DEBUG=1
+export XLA_BAZEL_VERBOSE=0
+export CXX=clang++-8
+export CC=clang-8
+export GLIBCXX_USE_CXX11_ABI=0
+export CFLAGS="${CFLAGS} -D_GLIBCXX_USE_CXX11_ABI=0"
+export CXXFLAGS="${CXXFLAGS} -D_GLIBCXX_USE_CXX11_ABI=0"
+export PATH=/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/go/bin:/home/tyoc213/go/bin:/home/tyoc213/miniconda3/envs/xla/include:$PATH</code></pre>
+<p>Probably some of them are not needed, but this worked out. Also this is not all that is needed, there is one extra set of commands needed because if not the lib will mix CXX11_ABI so it will not link (and you will not know after hours). To apply this inside the <code>pytorch</code> directory:</p>
+<pre><code>sed -i '/include(CMakeDependentOption)/i set(GLIBCXX_USE_CXX11_ABI 0)' CMakeLists.txt
+sed -i 's/set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -fPIC")/set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -fPIC -D_GLIBCXX_USE_CXX11_ABI=0")/g' third_party/gloo/CMakeLists.txt
+sed -i '/gloo_list_append_if_unique(CUDA_NVCC_FLAGS "-Xcompiler" "-fPIC")/i gloo_list_append_if_unique(CUDA_NVCC_FLAGS "-Xcompiler" "-D_GLIBCXX_USE_CXX11_ABI=0")' third_party/gloo/cmake/Cuda.cmake
+</code></pre>
+</section>
+<section id="building" class="level2">
+<h2 class="anchored" data-anchor-id="building">Building</h2>
+<p>So that is all needed if I didn’t miss something. So now we are ready to build this this, start at the top level pytorch:</p>
+<pre><code>(xla) tyoc213@u:~/Documents/github/pytorch$ python setup.py install
+(xla) tyoc213@u:~/Documents/github/pytorch$ cd xla
+(xla) tyoc213@u:~/Documents/github/pytorch/xla$ python setup.py install</code></pre>
+<p>In my 2015 CPU <code>Intel(R) Core(TM) i5-6500 CPU @ 3.20GHz</code> it taked like 2-4 hours compiling pytorch and then 8-10 hours compiling xla (which compiles internally TF).</p>
+</section>
+<section id="finally-running" class="level2">
+<h2 class="anchored" data-anchor-id="finally-running">Finally running</h2>
+<p>SO now that you have a working xla locally, you need to setup some extra vars to configure XLA for 1 GPU</p>
+<pre><code>export XRT_WORKERS="localservice:0;grpc://localhost:40934"
+export XRT_DEVICE_MAP="CPU:0;/job:localservice/replica:0/task:0/device:XLA_CPU:0|GPU:0;/job:localservice/replica:0/task:0/device:XLA_GPU:0"</code></pre>
+<p>If you have 4 GPUs, then use <code>export XRT_DEVICE_MAP="CPU:0;/job:localservice/replica:0/task:0/device:XLA_CPU:0|GPU:0;/job:localservice/replica:0/task:0/device:XLA_GPU:0|GPU:1;/job:localservice/replica:0/task:0/device:XLA_GPU:1|GPU:2;/job:localservice/replica:0/task:0/device:XLA_GPU:2|GPU:3;/job:localservice/replica:0/task:0/device:XLA_GPU:3"</code></p>
+</section>
+</section>
+<section id="why-all-this" class="level1">
+<h1>Why All this?</h1>
+<p>Having xla TPU support is still a missing and wanted feature of <a href="https://docs.fast.ai/">fastai</a>, some months a go <a href="https://twitter.com/butchland">Butch Landingin</a> and <a href="https://twitter.com/tyoc213">I</a> joined a hackathon to have a little reusable library it worked as a POC and in some moments we did have something working prior fastai 2 release but later we have found “extrange quirks” that have been difficult to track. And lately we have joined forces with <a href="iScienceLuvr">Tanishq Mathew Abraham</a> who has been working in his own support for fastai, so hopefully this time we can make this work.</p>
+<p>This was the first capture on Nov 26, see how the name says “compute” while on a 2080 <img src="images/xla_run.png" class="img-fluid" alt="first xla run"></p>
+<section id="the-good-parts" class="level2">
+<h2 class="anchored" data-anchor-id="the-good-parts">The good parts</h2>
+<p>the * It also means that we can have XLA tests running without TPU on a GPU and you don’t need to compile, only get latest build and run on docker GPU, or locally with full compiling as explained above. * XLA GPU optimizations could maybe help your current work? and maybe some things can be tested locally before running full production on the cloud. * The operations sended back to run on CPU locally <strong>feel</strong> not much slow as they are on TPUs just saying that maybe is more expensive to send ops to CPU on TPU that locally, but havent made a lot of tests and this should be only until all the ops are lowered to TPU. * Have all locally allows to change things like you want, for example I can see the slowness of TPU operations inside the fastai loop with chrome://tracing/ modyfing learner and running the XLA-GPU. And have already found a issue haven’t noticed in latest commits.</p>
+</section>
+<section id="the-bad-parts" class="level2">
+<h2 class="anchored" data-anchor-id="the-bad-parts">The bad parts</h2>
+<ul>
+<li>I have been only able to step/debug on python code, not on CPP (but hopefully someone that read this knows a tip to check my vscode settings).</li>
+<li>maybe I forgot something more specific in these instructions, but if you find an error, please share.</li>
+</ul>
+</section>
+</section>
+<section id="references" class="level1">
+<h1>References</h1>
+<ul>
+<li>First hint that xla run on GPU <a href="https://github.com/pytorch/xla/issues/2272">GPU support in PyTorch XLA</a></li>
+<li>This week I spammed the guys at xla <a href="https://github.com/pytorch/xla/issues/2642">Running locally</a> which foes first into running with docker, then locally.</li>
+<li>The last missing part, the sed <a href="https://github.com/pytorch/pytorch/issues/31943#issuecomment-637770008">error when building pytorch 1.1.0 from source</a></li>
+<li>Most of the build steps are on <a href="https://github.com/pytorch/xla/blob/master/CONTRIBUTING.md">xla/CONTRIBUTING</a></li>
+</ul>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>
