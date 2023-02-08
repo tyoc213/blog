@@ -1,0 +1,2076 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss  xmlns:atom="http://www.w3.org/2005/Atom" 
+      xmlns:media="http://search.yahoo.com/mrss/" 
+      xmlns:content="http://purl.org/rss/1.0/modules/content/" 
+      xmlns:dc="http://purl.org/dc/elements/1.1/" 
+      version="2.0">
+<channel>
+<title>tyoc213 blog&#39;s</title>
+<link>https://github.com/tyoc213/blog/index.html</link>
+<atom:link href="https://github.com/tyoc213/blog/index.xml" rel="self" type="application/rss+xml"/>
+<description>About dev and things</description>
+<generator>quarto-1.2.335</generator>
+<lastBuildDate>Sat, 05 Jun 2021 05:00:00 GMT</lastBuildDate>
+<item>
+  <title>Curvando la línea para llevar un fraude</title>
+  <link>https://github.com/tyoc213/blog/posts/2021-06-05-lineas_de_fraude.html</link>
+  <description><![CDATA[ 
+
+
+
+
+<section id="referencias-a-videos-originales" class="level1">
+<h1>Referencias a videos originales</h1>
+<p>El <a href="https://www.youtube.com/watch?v=z11f__1O978">EVITEMOS EL FRAUDE !! APRENDE A ANALIZAR EL PREP DEL INE CON PYTHON !!!</a> y las partes describiendo el código estan en</p>
+<ul>
+<li>0:0:0-24:50 (peque pandas code para plotear lineas de diferencia de votos)</li>
+<li>1:27:50-1:29:08 (como se ve un fraude)</li>
+</ul>
+<p>Desgraciadamente el INE decidio quitar la página inicial del PREP, pero por fortuna no quitaron a donde apunta y se puede encontrar una copia en https://web.archive.org/web/20210526174841/https://www.ine.mx/voto-y-elecciones/prep/ que la ultima disponible es el 27 de Mayo del 2021.</p>
+<p>Finalmente para descargar el mismo archivo que se muestra en el video navegar aquí y descargarlo localmente https://prep2018.ine.mx/#/diputaciones/nacional/1/3/1/1</p>
+<hr>
+<p>Este otro video explica más a fondo como se pueden detectar los fraudes más a fondo</p>
+<p><a href="https://www.youtube.com/watch?v=7aKcE5FiGIg">¡NO TE DEJES ENGAÑAR! MODELOS MATEMÁTICOS PARA DETECTAR FRAUDES ELECTORALES</a></p>
+</section>
+<section id="ejecutando-en-colab" class="level1">
+<h1>Ejecutando en colab</h1>
+<p>Este notebook usa python y se puede ejecutar en la nube por cualquier persona.</p>
+<p>Lo siguiente que tenemos que hacer es subirlo, lo unico que tienes que hacer es ejecutarlo mediante el menu</p>
+<ul>
+<li>Runtime -&gt; Run all</li>
+</ul>
+<p>ó</p>
+<ul>
+<li>Entorno de ejecución -&gt; Ejecutar todas</li>
+</ul>
+<p>ó simplemente mediante <code>CTRL+F9</code></p>
+<p>Al subirlo mediante el siguiente formulario debería de mostarse algo similar a esto <img src="https://github.com/tyoc213/blog/posts/images/upload_colab_widget.png" class="img-fluid" alt="images/upload_colab_widget.png"></p>
+<div class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><span class="im" style="color: #00769E;">from</span> google.colab <span class="im" style="color: #00769E;">import</span> files</span>
+<span id="cb1-2">uploaded <span class="op" style="color: #5E5E5E;">=</span> files.upload()</span></code></pre></div>
+</div>
+<div class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb2" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><span class="op" style="color: #5E5E5E;">%%</span>time</span>
+<span id="cb2-2"><span class="co" style="color: #5E5E5E;"># descomprimir el archivo que hayas subido desde el prep</span></span>
+<span id="cb2-3"><span class="op" style="color: #5E5E5E;">!</span>unzip <span class="dv" style="color: #AD0000;">20180702_2100</span><span class="er" style="color: #AD0000;">_PREP</span>.<span class="bu" style="color: null;">zip</span></span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Archive:  20180702_2100_PREP.zip
+ extracting: 20180702_2100_PREP_diputaciones.zip  
+ extracting: 20180702_2100_PREP_presidencia.zip  
+ extracting: 20180702_2100_PREP_senadurias.zip  
+CPU times: user 7.46 ms, sys: 872 µs, total: 8.33 ms
+Wall time: 273 ms</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb4" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><span class="op" style="color: #5E5E5E;">!</span>unzip <span class="dv" style="color: #AD0000;">20180702_2100</span><span class="er" style="color: #AD0000;">_PREP_diputaciones</span>.<span class="bu" style="color: null;">zip</span></span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Archive:  20180702_2100_PREP_diputaciones.zip
+   creating: 20180702_2100_PREP_diputaciones/
+  inflating: 20180702_2100_PREP_diputaciones/diputaciones.csv  
+  inflating: 20180702_2100_PREP_diputaciones/diputaciones_candidaturas_2018.csv  
+  inflating: 20180702_2100_PREP_diputaciones/LEEME.txt  </code></pre>
+</div>
+</div>
+<p>Si ya haz descomprimido los archivos, a partir de aquí puedes sacar las cuentas cumulativas entre un partido y el resto de partidos</p>
+<div class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb6" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><span class="co" style="color: #5E5E5E;"># cargar las librerías necesarias</span></span>
+<span id="cb6-2"></span>
+<span id="cb6-3"><span class="im" style="color: #00769E;">import</span> pandas <span class="im" style="color: #00769E;">as</span> pd</span>
+<span id="cb6-4"><span class="im" style="color: #00769E;">import</span> numpy <span class="im" style="color: #00769E;">as</span> np</span>
+<span id="cb6-5"><span class="im" style="color: #00769E;">import</span> matplotlib.pyplot <span class="im" style="color: #00769E;">as</span> plt</span>
+<span id="cb6-6">plt.rc(<span class="st" style="color: #20794D;">'figure'</span>, figsize<span class="op" style="color: #5E5E5E;">=</span>(<span class="dv" style="color: #AD0000;">10</span>, <span class="dv" style="color: #AD0000;">10</span>))</span></code></pre></div>
+</div>
+<div class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb7" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><span class="co" style="color: #5E5E5E;"># definimos algunos valores de las variables</span></span>
+<span id="cb7-2"></span>
+<span id="cb7-3">partidos <span class="op" style="color: #5E5E5E;">=</span> [<span class="st" style="color: #20794D;">'MORENA'</span>, <span class="st" style="color: #20794D;">'PAN'</span>, <span class="st" style="color: #20794D;">'PRI'</span>, <span class="st" style="color: #20794D;">'PRD'</span>]</span>
+<span id="cb7-4">tiempo<span class="op" style="color: #5E5E5E;">=</span><span class="st" style="color: #20794D;">'FECHA_HORA_CAPTURA'</span></span></code></pre></div>
+</div>
+<div class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb8" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><span class="co" style="color: #5E5E5E;"># leemos los datos</span></span>
+<span id="cb8-2">datos <span class="op" style="color: #5E5E5E;">=</span> pd.read_csv(<span class="st" style="color: #20794D;">'20180702_2100_PREP_diputaciones/diputaciones.csv'</span>, sep<span class="op" style="color: #5E5E5E;">=</span><span class="st" style="color: #20794D;">'|'</span>, engine<span class="op" style="color: #5E5E5E;">=</span><span class="st" style="color: #20794D;">'python'</span>, header<span class="op" style="color: #5E5E5E;">=</span><span class="dv" style="color: #AD0000;">5</span>)</span></code></pre></div>
+</div>
+<div class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb9" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><span class="co" style="color: #5E5E5E;"># vamos a descartar las líneas que no se contabilizaron</span></span>
+<span id="cb9-2">lineas_malas <span class="op" style="color: #5E5E5E;">=</span> datos[datos[<span class="st" style="color: #20794D;">'CONTABILIZADA'</span>]<span class="op" style="color: #5E5E5E;">==</span><span class="dv" style="color: #AD0000;">0</span>].index</span>
+<span id="cb9-3">datos.drop(lineas_malas, inplace<span class="op" style="color: #5E5E5E;">=</span><span class="va" style="color: #111111;">True</span>)</span></code></pre></div>
+</div>
+<div class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb10" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><span class="kw" style="color: #003B4F;">def</span> limpia(data, columna):</span>
+<span id="cb10-2">    data[columna] <span class="op" style="color: #5E5E5E;">=</span> data[columna].replace(<span class="st" style="color: #20794D;">'-'</span>, <span class="dv" style="color: #AD0000;">0</span>)</span>
+<span id="cb10-3">    data[columna] <span class="op" style="color: #5E5E5E;">=</span> data[columna].replace(<span class="st" style="color: #20794D;">'Ilegible'</span>, <span class="dv" style="color: #AD0000;">0</span>)</span>
+<span id="cb10-4">    data[columna] <span class="op" style="color: #5E5E5E;">=</span> data[columna].replace(<span class="st" style="color: #20794D;">'Sin dato'</span>, <span class="dv" style="color: #AD0000;">0</span>)</span>
+<span id="cb10-5">    data[columna] <span class="op" style="color: #5E5E5E;">=</span> pd.to_numeric(data[columna], errors<span class="op" style="color: #5E5E5E;">=</span><span class="st" style="color: #20794D;">'raise'</span>)</span></code></pre></div>
+</div>
+<div class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb11" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><span class="cf" style="color: #003B4F;">for</span> partido <span class="kw" style="color: #003B4F;">in</span> partidos:</span>
+<span id="cb11-2">    limpia(datos, partido)</span></code></pre></div>
+</div>
+<div class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb12" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1">datos.sample(<span class="dv" style="color: #AD0000;">5</span>)</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="10">
+
+<div>
+
+<table class="dataframe table table-sm table-striped">
+  <thead>
+    <tr>
+      <th></th>
+      <th>CLAVE_CASILLA</th>
+      <th>CLAVE_ACTA</th>
+      <th>ID_ESTADO</th>
+      <th>ESTADO</th>
+      <th>ID_DISTRITO_FEDERAL</th>
+      <th>DISTRITO_FEDERAL</th>
+      <th>SECCION</th>
+      <th>ID_CASILLA</th>
+      <th>TIPO_CASILLA</th>
+      <th>EXT_CONTIGUA</th>
+      <th>...</th>
+      <th>CONTABILIZADA</th>
+      <th>MECANISMOS_TRASLADO</th>
+      <th>SHA</th>
+      <th>FECHA_HORA_ACOPIO</th>
+      <th>FECHA_HORA_CAPTURA</th>
+      <th>FECHA_HORA_VERIFICACION</th>
+      <th>ORIGEN</th>
+      <th>DIGITALIZACION</th>
+      <th>TIPO_DOCUMENTO</th>
+      <th>COTEJADA</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>1373</th>
+      <td>'010263C0100'</td>
+      <td>'010263C010006'</td>
+      <td>1</td>
+      <td>AGUASCALIENTES</td>
+      <td>3</td>
+      <td>Aguascalientes</td>
+      <td>0263</td>
+      <td>1</td>
+      <td>C</td>
+      <td>0</td>
+      <td>...</td>
+      <td>1</td>
+      <td>D</td>
+      <td>4ab896849e13fcc2a26b1962115c2041d23bff9e8bee0b...</td>
+      <td>2018-07-01 22:28:00</td>
+      <td>2018-07-01 23:06:00</td>
+      <td>2018-07-01 23:08:02</td>
+      <td>CATD</td>
+      <td>ESC�NER</td>
+      <td>Acta PREP</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>15969</th>
+      <td>'071735C0200'</td>
+      <td>'071735C020006'</td>
+      <td>7</td>
+      <td>CHIAPAS</td>
+      <td>6</td>
+      <td>Tuxtla Guti�rrez</td>
+      <td>1735</td>
+      <td>2</td>
+      <td>C</td>
+      <td>0</td>
+      <td>...</td>
+      <td>0</td>
+      <td>D</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>CATD</td>
+      <td>ESC�NER</td>
+      <td>-</td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <th>142531</th>
+      <td>'301356B0100'</td>
+      <td>'301356B010006'</td>
+      <td>30</td>
+      <td>VERACRUZ</td>
+      <td>2</td>
+      <td>Tantoyuca</td>
+      <td>1356</td>
+      <td>1</td>
+      <td>B</td>
+      <td>0</td>
+      <td>...</td>
+      <td>1</td>
+      <td>D</td>
+      <td>c153534dc09dee6577bdf41e45204db25ac05237b3ed04...</td>
+      <td>2018-07-02 08:27:00</td>
+      <td>2018-07-02 09:22:00</td>
+      <td>2018-07-02 09:23:27</td>
+      <td>CATD</td>
+      <td>ESC�NER</td>
+      <td>Acta PREP</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>98989</th>
+      <td>'191505C0200'</td>
+      <td>'191505C020006'</td>
+      <td>19</td>
+      <td>NUEVO LE�N</td>
+      <td>6</td>
+      <td>Monterrey</td>
+      <td>1505</td>
+      <td>2</td>
+      <td>C</td>
+      <td>0</td>
+      <td>...</td>
+      <td>1</td>
+      <td>D</td>
+      <td>1f48bb9db93215c4db2a46c73a7459122e9b6956fa4a81...</td>
+      <td>2018-07-02 16:26:00</td>
+      <td>2018-07-02 16:45:00</td>
+      <td>2018-07-02 16:46:18</td>
+      <td>CATD</td>
+      <td>ESC�NER</td>
+      <td>Acta PREP</td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <th>150484</th>
+      <td>'304531C0100'</td>
+      <td>'304531C010006'</td>
+      <td>30</td>
+      <td>VERACRUZ</td>
+      <td>16</td>
+      <td>C�rdoba</td>
+      <td>4531</td>
+      <td>1</td>
+      <td>C</td>
+      <td>0</td>
+      <td>...</td>
+      <td>1</td>
+      <td>F-D</td>
+      <td>2f7475f3513f0981216175beb202322a5bb37ca524ad65...</td>
+      <td>2018-07-01 21:56:00</td>
+      <td>2018-07-01 23:03:00</td>
+      <td>2018-07-01 23:29:15</td>
+      <td>CASILLA</td>
+      <td>M�VIL</td>
+      <td>Acta PREP</td>
+      <td>1</td>
+    </tr>
+  </tbody>
+</table>
+<p>5 rows × 56 columns</p>
+</div>
+</div>
+</div>
+<div class="cell" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb13" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><span class="co" style="color: #5E5E5E;"># ordenamos los datos por tiempo (la columna 'FECHA_HORA_CAPTURA')</span></span>
+<span id="cb13-2">datos_ordenados <span class="op" style="color: #5E5E5E;">=</span> datos.sort_values(by<span class="op" style="color: #5E5E5E;">=</span>[tiempo])</span>
+<span id="cb13-3">datos_ordenados.reset_index(inplace<span class="op" style="color: #5E5E5E;">=</span><span class="va" style="color: #111111;">True</span>)</span></code></pre></div>
+</div>
+<div class="cell" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb14" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1">diferencias <span class="op" style="color: #5E5E5E;">=</span> []</span>
+<span id="cb14-2"><span class="cf" style="color: #003B4F;">for</span> partido <span class="kw" style="color: #003B4F;">in</span> partidos[<span class="dv" style="color: #AD0000;">1</span>:]:</span>
+<span id="cb14-3">    base <span class="op" style="color: #5E5E5E;">=</span> partidos[<span class="dv" style="color: #AD0000;">0</span>]</span>
+<span id="cb14-4">    contra <span class="op" style="color: #5E5E5E;">=</span> partido</span>
+<span id="cb14-5">    <span class="bu" style="color: null;">print</span>(base, <span class="st" style="color: #20794D;">'vs'</span>, partido)</span>
+<span id="cb14-6">    resta <span class="op" style="color: #5E5E5E;">=</span> np.cumsum(datos_ordenados[base]<span class="op" style="color: #5E5E5E;">-</span>datos_ordenados[contra])</span>
+<span id="cb14-7">    diferencias.append(resta)</span>
+<span id="cb14-8"></span>
+<span id="cb14-9"></span>
+<span id="cb14-10"><span class="cf" style="color: #003B4F;">for</span> d <span class="kw" style="color: #003B4F;">in</span> diferencias:</span>
+<span id="cb14-11">    plt.plot(d)</span>
+<span id="cb14-12">plt.ylabel(<span class="st" style="color: #20794D;">'diferencia de votos'</span>)</span>
+<span id="cb14-13">plt.show()</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>MORENA vs PAN
+MORENA vs PRI
+MORENA vs PRD</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="https://github.com/tyoc213/blog/posts/2021-06-05-lineas_de_fraude_files/figure-html/cell-13-output-2.png" class="img-fluid"></p>
+</div>
+</div>
+</section>
+<section id="dudas-o-comentarios" class="level1">
+<h1>Dudas o comentarios</h1>
+<p>Aquí abajo puedes dejar tus comentarios o dudas que tengas para ejecutar tu mismo este análisis y talvez después otros si más gente coopera al conocimiento colectivo, ¡vamos que es fácil compartir!, recuerden que las cosas que no se coparten se pierden.</p>
+
+
+</section>
+
+ ]]></description>
+  <guid>https://github.com/tyoc213/blog/posts/2021-06-05-lineas_de_fraude.html</guid>
+  <pubDate>Sat, 05 Jun 2021 05:00:00 GMT</pubDate>
+  <media:content url="https://github.com/tyoc213/blog/posts/images/upload_colab_widget.png" medium="image" type="image/png" height="28" width="144"/>
+</item>
+<item>
+  <title>Dos and don’ts with invitation to make study groups</title>
+  <link>https://github.com/tyoc213/blog/posts/2021-04-10-dos-and-donts-with-invitation-to-make-study-groups.html</link>
+  <description><![CDATA[ 
+
+
+
+
+<section id="how-it-started" class="level1">
+<h1>How it started</h1>
+<p>I started learning deep learning 2 or 3 years ago watching the Jeremy videos. I learned some things but I didn’t code, watching videos isn’t enough, sure I learned to use Jupyter lab and were able to follow some tutorials and understand some concepts but still lots of things were still vague.</p>
+<p>My first study group ever was for reading the <a href="https://github.com/fastai/fastbook">fastabook</a>, were we joined the meeting read silently the chapter in turn and then try to answer 1 or 2 questions that were on the lines of <strong>why</strong> or <strong>how</strong> and don’t focus on <strong>what</strong> questions. It took some months to read 18 chapters (one chapter per week). As all study groups, it started with more people than the ones who could finish it. It was my first time finishing a technical book in quite some time and feel that I have learned and appreciated things I could not do only watching videos.</p>
+<p>By the end last months of the 2020 I have already think of taking a look at <a href="http://walkwithfastai.github.io/">walk with fastai 2020 course</a> but I was “slow” and not finding time to do it, was only a “target” or a TODO item. So after I joined a meeting on the voice channel of fastai discord, I had time to talk with Zachary and ask him if it was “fine” to start a new study group for his course and he liked the idea. So the first thing I did was to watch the videos fast forward and make the timings for youtube at same time Zach was working on updating and moving all to this new site with a submenu and all the work needed to keep up to date working notebooks.</p>
+<p>When I posted the invitation for this study group, I chose to make the study group meet 2 times a week: one to watch the video and the next one to execute the notebook(s) for the class. I think this is hard because people need to keep 2 slots of their week time, but what I was trying to make is like make the watch the video “optional” and run it yourself not optional (so you can still watch the video on your own).</p>
+</section>
+<section id="meetings" class="level1">
+<h1>Meetings</h1>
+<p>So the time catched up in January and Zachary had already moved all the notebooks to the new site. I will write a little about the first meeting(s) and follow ups and place some Do’s and Don’ts.</p>
+<section id="tools" class="level2">
+<h2 class="anchored" data-anchor-id="tools">tools</h2>
+<ul>
+<li>Instead of using the video sharing on discord, I decided to use <a href="https://app.getmetastream.com/">metastream</a> to share the playback of the video (I also had at the side a copy of the “blank” times of the video to skip easely)</li>
+<li>For the firsts sessions I used locally jupyter lab and VSCode (which I also showed how I worked with nbdev and VSCode hand in hand), but after some updates on local drivers and pytorch don’t providing support for the newest drivers I ended using colab (you can only have 2 running notebooks on colab).</li>
+<li>Discord was used to talk/discuss the video and most of all in the second session to run your own notebook.</li>
+</ul>
+</section>
+<section id="first-weeks" class="level2">
+<h2 class="anchored" data-anchor-id="first-weeks">First weeks</h2>
+<p>For the first meetings more than 10 people joined, they installed the required plugin by metastream and watched the shared play it was a nice start and for the “run the notebook meeting” I decided not to take a look more than the video itself and did not run the notebook before hand so the first meeting I was only able to cover the <a href="https://walkwithfastai.com/Pets">first pet session</a> instead of the 3 notebooks and I used 1:30 hours (some people left because as I have said sometimes time constraints are difficult).</p>
+<p>In that presentation I showed how to use Jupyter, how to see where the code is from visual studio code and if I’m not wrong a little about how to work on nbdev and vscode one side or the other. I also skip a little and showed how to call <a href="https://docs.fast.ai/learner.html#Learner.show_training_loop">show training loop</a> and maybe other things that were explained later in the videos.</p>
+<p>Also it was the first time I was getting feedback from participants, while I have been a user of fastai I was not able to completely understand the progress bar and some one hinted to me that it shows the current accuracy, how many samples of the batch are and the remaining time over runtime. Also got feedback to understand the recorder plot learning rate, all these things I have seen in videos and ran in notebooks before, but didn’t understand the little details.</p>
+</section>
+<section id="middle-sessions" class="level2">
+<h2 class="anchored" data-anchor-id="middle-sessions">middle sessions</h2>
+<p>Watching the video together was mostly just that but on Thursday for me it still took quite some time to finish just one notebook, still the discussions were nice and extended, always learning something from the people who shared their knowledge or taking more internally something I have seen before.</p>
+<p>I started to see more of the patterns of the library as I explained them and got more used to seeing the common parts of the high level API, and understood a little better the difference between having and instance of a dataloader taht is used to pass data to the learner in batches and the “template” needed to make the instance which is a <code>DataBlock</code>.</p>
+<p>Also at some point people started to show less and finally the people that ended where the ones showing up meet by meet.</p>
+<p>I have also received the feedback that I should run notebooks beforehand to see if there are possible errors instead of tackling them at the moment and with this I could start covering more than 1 notebook in 1 hour because sometimes running a specific line and “fixing” the issue at the moment which sometimes result in orienting the talk to other issues instead of the notebook itself.</p>
+</section>
+<section id="final-sessions" class="level2">
+<h2 class="anchored" data-anchor-id="final-sessions">final sessions</h2>
+<p>As with all study groups (and maybe a lot of things in life) at end there were a lot less people the people that committed till the end, probably just because making time to have a schedule on your own time is not easy to keep, but also could be my bad handling of the group, or that 2 meetings a week is a lot, or maybe I didn’t provide enough good information and was boring. But as other people have said, don’t worry about that, is what happens with these study groups and lots of things that surge out of pure interest.</p>
+<p>From time to time people more knowledgeable showed up not only the ones attending since the start and shared some of their knowledge, that is always appreciated in any meeting.</p>
+<p>And finally the last sessions took place and we finally did it from start to finish, and for me it was a great experience being the first time doing something like this, learning from people mostly, it was also a way to go over the course, because as I have said I only have think to go over the course for some time until I did it this way.</p>
+<p>Nice things that happened was that Zachary also joined some times and molly (which leaded the first study group I joined) showed up and explained more advanced things to fellows, things that I we haven’t thought about or knew how to explain, so it was nice.</p>
+</section>
+<section id="dos" class="level2">
+<h2 class="anchored" data-anchor-id="dos">Do’s</h2>
+<ul>
+<li>Record the meetings there will be always useful information for newcomers or even to middle or advanced users (sadly I didn’t do this thinking that people will be mad if I recorded the meetings, but while running the study group, people started to ask about recordings).</li>
+<li>Do run notebooks beforehand so that errors pop out if any exist and solve it beforehand (you can explain them in session and some of them could be as easy as downloading an image). Also being ready to present and is not “cheating”. Is being ready to explain ;).</li>
+<li>Write a blogpost for each meeting or keep track of each meeting in a note, basically keep track of the things you did learn or understand better after the meeting (is like sending notes after a meeting just to check that those points are important). I didn’t keep track but learned a lot of things. Sadly this is the only blog post I have made about these meetings, but I’m sure I will forget some things if I don’t put them in practice soon or write about them. This tip can also help people watching the streams or course.</li>
+<li>Be honest about what you don’t know or understand, there are people that have the knowledge or people that understand better or in a different way so invite them to share the knowledge.</li>
+<li>Be clear about dates/times, sadly the time we did our study group it didn’t fit people in Europe (3am for them), but here is where recordings could help.</li>
+<li>Focus on a level, or make it clear, for me this was more beginner friendly, but interactions with people make it advanced or more helpful than just beginner friendly (and it is always good that someone with more experience joins).
+<ul>
+<li>On that note, if you have something that you can’t answer and there is no one around that can explain it, feel free to try to ping friends on chat or someone on the chat at the moment so that they can join at the moment (or answer later in text).</li>
+</ul></li>
+<li>Submit bugs or changes to the repo you are using for reference so that it keeps up to date, the maintainer will like help with maintaining source in good shape to be helpful as it was intended when created.</li>
+<li>Even if you don’t understand something, having or attending a study group will expose you to the opportunity to exchange other people’s point of view and understanding of the subject. As someone pointed in one meeting “I have been working with pandas the whole time, but found 1 call on the notebooks that I didn’t know, so it is always good to watch other people how they use a tool you always discover something you aren’t using”.</li>
+<li>If possible have a target to apply what all are learning in the study group, one of the things I could not solve was the invitation or wondering of people asking if we will do a kaggle competition, analyse something, in other way people were asking “how we can apply this we are learning now?”, sure in the future what has been learned will contribute to solve something, but for this time I didn’t have a project, kaggle comp or something to give to the attendees.</li>
+<li>Try to make questions that ask for: why and how, questions that can move you or others to learn furter.</li>
+</ul>
+</section>
+<section id="donts" class="level2">
+<h2 class="anchored" data-anchor-id="donts">Dont’s</h2>
+<ul>
+<li>Not keep track of what you learned, not just read, but make a note on what you understand now that didn’t before, make your own resume.</li>
+<li>As organizer don’t forget about the meeting and if you will not have time because something show up do one of this:
+<ul>
+<li>notify on time (at least 30 min before and if possible at start of the day or even before that).</li>
+<li>ask if someone wants to lead a meeting (hopefully within a week from the event), you can invite your own attendees probably making it their first time leading an online meeting. I didn’t do this, but it would be nice to invite people to take the lead on something if they want to participate like that.</li>
+</ul></li>
+<li>Say things that you will not meet on time.</li>
+<li>Improve if possible what you are following, but I have sended one PR to Zach, there were a lot of little PRs that I wanted to do as improvements or extra hints but haven’t done.</li>
+</ul>
+</section>
+<section id="maybe-donts" class="level2">
+<h2 class="anchored" data-anchor-id="maybe-donts">Maybe dont’s</h2>
+<p>Maybe doing 2 meetings a week is too much, I’m not sure, but maybe ask or make clear that one of the meetings they can do on their own and the other is more participative. Also I have seen some study groups have 2 meetings to tackle bigger books in “little time”.</p>
+</section>
+</section>
+<section id="finally-an-invitation-to-make-more-study-groups" class="level1">
+<h1>Finally an Invitation to make more study groups</h1>
+<p>So I guided a study group without knowing much and without experience as people were able to see it, you don’t need to have perfect knowledge beforehand (sure it is nice if you are and can provide high level extra hints it is always neat when someone with nice skills share their knowledge openly) but also learning with ppl reading first time is nice.</p>
+<p>So my final point is to make an invitation to use more of the audio channels with video streams on discord fastai, make more study groups if not on fastai in other related subjects. I think it is a nice opportunity to share lots of things interactively.</p>
+<p>For example I have joined a blender 3d discord and there you will see they have like 10 channels where people jump on and off to share what they are working and sometimes people help, yeah it would be hard to get to that level of sharing and maybe to chaotic… but at least study groups could be created it also helps you to present to a public a talk and organize yourself a little a week.. I show one of this Discord capture of some blender users sharing at the moment what they are doing and asking for feedback/help:</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="https://github.com/tyoc213/blog/posts/images/blender-discord.png" class="img-fluid figure-img"></p>
+<p></p><figcaption class="figure-caption">image.png</figcaption><p></p>
+</figure>
+</div>
+<p>Indeed forums and discord chat are nice (and you have history), but also watching or talking to people is important because talk is one aspect of human life, also you can get carried away more easily talking than writing (because you can edit, delete and so on).</p>
+<p>Even if you are in another area and not DL, always having people to talk to about a subject matter is important, because you don’t only get your point of view. For me this was my first time leading a study group and I apart from learning I also noticed things I have not put attention to, sure I’m still a novice, but that is not a stopper to organize online meetings at the end you are also learning and probably most of us are not teachers that need to know beforehand what is being teached, that is why it is a study group keep people interacting and maintain the schedule so that there is a space to talk about the subject at hand.</p>
+<p>:)</p>
+
+
+</section>
+
+ ]]></description>
+  <guid>https://github.com/tyoc213/blog/posts/2021-04-10-dos-and-donts-with-invitation-to-make-study-groups.html</guid>
+  <pubDate>Sat, 10 Apr 2021 05:00:00 GMT</pubDate>
+  <media:content url="https://github.com/tyoc213/blog/posts/images/blender-discord.png" medium="image" type="image/png" height="61" width="144"/>
+</item>
+<item>
+  <title>Lowering SiLU in pytorch/XLA</title>
+  <link>https://github.com/tyoc213/blog/posts/2021-01-24-op_lowering_pythorchXLA.html</link>
+  <description><![CDATA[ 
+
+
+
+
+<section id="introduction" class="level1">
+<h1>Introduction</h1>
+<p>As a follow up of <a href="https://tyoc213.github.io/blog/xla/fastai/2020/11/28/compiling-xla-locally.html">compiling pytorch locally</a>, the next objective was to lower an operation, but the documentation on pytorch and XLA is almost the same (think of XLA as an extension of Pytorch), you can check the <a href="https://github.com/pytorch/xla/blob/master/OP_LOWERING_GUIDE.md">OP_LOWERING_GUIDE</a> which basically is <a href="https://pytorch.org/xla/release/1.7/index.html#op-lowering-guide">OP LOWERING GUIDE</a> from pytorch, probably you will get it at first hand, but I was not exactly sure what to do next for example I didn’t know when to modify <a href="https://github.com/pytorch/xla/blob/master/scripts/gen.py">gen.py</a> (which you don’t need if it is already in <a href="https://github.com/pytorch/xla/issues/2717#issuecomment-755007143">see</a> and other things.</p>
+<section id="what-says-the-op-lowering-guide" class="level2">
+<h2 class="anchored" data-anchor-id="what-says-the-op-lowering-guide">What says the op lowering guide?</h2>
+<p>Now that I have lowered an op, I think what the lowering guide says is something like this:</p>
+<ol type="1">
+<li>That you need to have an environment to compile/test/run</li>
+<li>That you need to understand the operation <a href="https://pytorch.org/docs/stable/generated/torch.nn.SiLU.html">SiLU</a></li>
+<li>That you need to implement new operations copying verbatim the signature from header and cpp files to <code>aten_xla_type.h/cpp</code> from <code>aten_xla_type_default.h/cpp</code></li>
+<li>You will use <code>XLATensor</code> tensors as input and output as pytorch tensor (ATen means “a tensor library”)</li>
+<li>From this level in <code>tensor_methods</code> will be <code>ir</code> ops that are constructed from pytorch to use the <a href="https://www.tensorflow.org/xla/operation_semantics">tensorflow XLA compiler ops</a> (which I think it is not exhaustive? not all is output to the doc?). This operations include for example the <code>*</code> I used and <a href="https://github.com/pytorch/xla/blob/3eaee46ef679cc6a0f1f694bd0a007dbfd09c51b/torch_xla/csrc/elementwise.cpp#L176-L181">xla::Sigmoid</a></li>
+</ol>
+<p>They also list 2 <a href="https://github.com/pytorch/xla/pull/1592">Add inverse op and test</a> and <a href="https://github.com/pytorch/xla/pull/1940">Implement the lowering for HardSigmoid and HardSigmoidBackward</a> which could help and are a good start too.</p>
+</section>
+</section>
+<section id="the-opportunity" class="level1">
+<h1>The opportunity</h1>
+<p>I asked in which op I can contribute and <a href="https://github.com/JackCaoG">JackCaoG</a> suggested the ones that were in the backlog, unfortunately they were probably not entry level, by fortune little time after the opportunity showed up <a href="https://github.com/pytorch/xla/issues/2717">here</a> and this SiLU op was good for entry level because as description says it uses as base Sigmoid which is already lowered also JackCaoG said it should be mostly like <a href="https://github.com/pytorch/xla/blob/1a56d70a9a48446536912d80c6f929519453258e/torch_xla/csrc/tensor_methods.cpp#L2352-L2364">sigmoid</a> or <a href="https://github.com/pytorch/xla/blob/1a56d70a9a48446536912d80c6f929519453258e/torch_xla/csrc/tensor_methods.cpp#L1590-L1602">log_sigmoid</a> and from the description on the documentation it looked like that.</p>
+<p>I really don’t know much about pytorch and sure I didn’t know of SiLU before, but the signature of SiLU was not like those provided as base, I finally checked the other ops that ended with <code>_out(</code> as example <a href="https://github.com/pytorch/xla/blob/1a56d70a9a48446536912d80c6f929519453258e/torch_xla/csrc/aten_xla_type.cpp#L566-L572">arange_out</a></p>
+</section>
+<section id="implementation" class="level1">
+<h1>Implementation</h1>
+<p>As always, create a new branch and don’t forget to update to the latest master in pytorch and XLA (which in my case caused some behaviour about synching the repos).</p>
+<section id="create-the-base" class="level2">
+<h2 class="anchored" data-anchor-id="create-the-base">1. Create the base</h2>
+<p>First commit https://github.com/pytorch/xla/pull/2721/commits/c16fedbbee3662d3470629dc7fff51c63dd60855</p>
+<p>It provides the base and starting point:</p>
+<ol type="1">
+<li>Copy the signature from the header and implementation of to ``</li>
+<li>Copy the body from the header to .</li>
+<li>It also reused at a higher level the Sigmoid as expected, the problem with this is that the generated graph for the compiler will list this as a <code>x * sigmoid(x)</code> (which was basically this <code>input.GetIrValue() * ir::ops::Sigmoid(input.GetIrValue());</code>) instead of a <code>SiLU</code> in the node graph.</li>
+</ol>
+<p>But this implementation was good enough to compile without errors and actually run my rudimentary base test that output the same values for cpu implementation and XLA implementation</p>
+<div class="sourceCode" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><span class="im" style="color: #00769E;">import</span> torch</span>
+<span id="cb1-2"><span class="im" style="color: #00769E;">from</span> torch.nn <span class="im" style="color: #00769E;">import</span> SiLU</span>
+<span id="cb1-3"><span class="im" style="color: #00769E;">import</span> torch_xla.core.xla_model <span class="im" style="color: #00769E;">as</span> xm</span>
+<span id="cb1-4"></span>
+<span id="cb1-5"></span>
+<span id="cb1-6">dede<span class="op" style="color: #5E5E5E;">=</span>xm.xla_device()</span>
+<span id="cb1-7">m <span class="op" style="color: #5E5E5E;">=</span> SiLU()</span>
+<span id="cb1-8">m <span class="op" style="color: #5E5E5E;">=</span> m.to(dede)</span>
+<span id="cb1-9"></span>
+<span id="cb1-10"><span class="bu" style="color: null;">input</span> <span class="op" style="color: #5E5E5E;">=</span> torch.randn(<span class="dv" style="color: #AD0000;">2</span>)</span>
+<span id="cb1-11">input2 <span class="op" style="color: #5E5E5E;">=</span> <span class="bu" style="color: null;">input</span>.clone() <span class="co" style="color: #5E5E5E;"># this is on CPU</span></span>
+<span id="cb1-12"><span class="bu" style="color: null;">input</span> <span class="op" style="color: #5E5E5E;">=</span> <span class="bu" style="color: null;">input</span>.to(dede)</span>
+<span id="cb1-13"></span>
+<span id="cb1-14">output <span class="op" style="color: #5E5E5E;">=</span> m(<span class="bu" style="color: null;">input</span>)</span>
+<span id="cb1-15"><span class="bu" style="color: null;">print</span>(output)</span>
+<span id="cb1-16"><span class="bu" style="color: null;">print</span>(output.device) <span class="co" style="color: #5E5E5E;"># should print xla</span></span>
+<span id="cb1-17"></span>
+<span id="cb1-18">m2 <span class="op" style="color: #5E5E5E;">=</span> SiLU()</span>
+<span id="cb1-19"><span class="bu" style="color: null;">print</span>(<span class="st" style="color: #20794D;">"normal"</span>)</span>
+<span id="cb1-20"><span class="bu" style="color: null;">print</span>(<span class="st" style="color: #20794D;">'input2'</span>, input2)</span>
+<span id="cb1-21">o2 <span class="op" style="color: #5E5E5E;">=</span> m2(input2)</span>
+<span id="cb1-22"><span class="bu" style="color: null;">print</span>(o2) <span class="co" style="color: #5E5E5E;"># this should match print above</span></span></code></pre></div>
+<p>The review of the PR suggested the next step, which is:</p>
+</section>
+<section id="go-deeper-with-the-lowering" class="level2">
+<h2 class="anchored" data-anchor-id="go-deeper-with-the-lowering">2. Go deeper with the lowering</h2>
+<p>Now that you have a base go deeper and make your node appear.</p>
+<p>Because when people is debugging the generated graph of tensor ops in XLA with the previous implementation it would be better if calling <code>SiLU</code> would generate a <code>SiLU</code> node and not <code>x * sigmoid(x)</code> as the previous step.</p>
+<p>Second commit https://github.com/pytorch/xla/pull/2721/commits/c16fedbbee3662d3470629dc7fff51c63dd60855</p>
+<p>It shows how to add an op that will be used as a node in the generated graph for the operation.</p>
+<ol type="1">
+<li>It adds the operation to <code>ops.h/cpp</code></li>
+<li>It converts from tensors to XLA tensors and back.</li>
+<li>It reuses at this level the implementation of SiLU (which is valid because you have already named the node at this level) which is <code>node.ReturnOp(xla_input * BuildSigmoid(xla_input), loctx)</code> and provides a “name” for the node with <code>GenericOp(OpKind(at::aten::silu), {input}, input.shape(), std::move(lower_fn))</code>.</li>
+</ol>
+<p>My first approach was to repeat all so I duplicated the <a href="https://github.com/pytorch/xla/blob/3eaee46ef679cc6a0f1f694bd0a007dbfd09c51b/torch_xla/csrc/elementwise.cpp#L176-L181">sigmoid implemented</a> in <code>elementwise.h/cpp</code> and used that but the review of the PR suggested that I can call sigmoid because the node was already a <code>SiLU</code> so it doesn’t matter if I reused what was already there at that moment. I corrected with an amended and just reused Sigmoid instead of my SiLU in elementwise, making the commit writes 2 less files than amended commit.</p>
+</section>
+<section id="the-backward-pass" class="level2">
+<h2 class="anchored" data-anchor-id="the-backward-pass">The backward pass</h2>
+<p>This operation didn’t include a backward pass, you should implement it if the header contains the forward and the backward pass, this was more a <code>_out</code> operation that is also used for in place methods.</p>
+<p>Note: I haven’t seen how this <em>dispatch</em> works, but I guess works like <em>simple inheritance</em>, when <code>aten_xla_type</code> don’t provide the method then the ones from <code>aten_xla_type_default</code> are used (which is the CPU implementations and <em>fallbacks</em>). But see that the type <code>AtenXlaType</code> is not a <code>subclass</code> <a href="https://github.com/pytorch/xla/blob/master/torch_xla/csrc/aten_xla_type.cpp#L26-L30">aten_xla_type</a>”</p>
+<p>“Also note that <code>aten_xla_type_default</code> which is auto generated after build in some stage because it is not in repo and is ignored in <code>.gitignore</code>. So it should be other type of <code>dynamic dispatching</code> somewhere <em>deep in the code</em>.</p>
+</section>
+</section>
+<section id="conclusion" class="level1">
+<h1>Conclusion</h1>
+<p>Lowering an op is difficult, but practice does help and easy tasks does too. You also need to provide a test case, which probably is just to take a template from a previous one (because test from CPU pytorch are used as base).</p>
+<p>There are different things you need to know at less a little: pytorch, XLA, C++ (to see how the default operation is implemented), even some cuda if you can read that and take it as reference apart from the default CPU implementations and “cpu_fallback” (which I still don’t know how they differ from CPU implementations or when they are used).</p>
+<p>Hopefully this little explanation will help another person who wants to contribute lowering ops and understand a little better what is explained on the op lowering guide.</p>
+
+
+</section>
+
+ ]]></description>
+  <category>xla</category>
+  <guid>https://github.com/tyoc213/blog/posts/2021-01-24-op_lowering_pythorchXLA.html</guid>
+  <pubDate>Sun, 24 Jan 2021 06:00:00 GMT</pubDate>
+</item>
+<item>
+  <title>Audio y auto estudio interview</title>
+  <link>https://github.com/tyoc213/blog/posts/2021-01-09-fastchai-rbracco-audio-y-estudio-propio.html</link>
+  <description><![CDATA[ 
+
+
+
+
+<blockquote class="twitter-tweet blockquote" data-dnt="true" data-theme="dark">
+<p lang="en" dir="ltr">
+Here's my interview with Robbert Bracco <a href="https://twitter.com/MadeUpMasters?ref_src=twsrc%5Etfw"><span class="citation" data-cites="MadeUpMasters">@MadeUpMasters</span></a> (author of "Things Jeremy Says to do" on the <a href="https://twitter.com/fastdotai?ref_src=twsrc%5Etfw"><span class="citation" data-cites="fastdotai">@fastdotai</span></a> forums) all about deep learning and <a href="https://t.co/wANZD5nFcn">https://t.co/wANZD5nFcn</a> (library) applied to audio, self-study in ML.<br>Audio: <a href="https://t.co/T9CeIBtUKr">https://t.co/T9CeIBtUKr</a><br><br>Video: <a href="https://t.co/ZCJzuxCIwG">https://t.co/ZCJzuxCIwG</a>
+</p>
+— Sanyam Bhutani (<span class="citation" data-cites="bhutanisanyam1">@bhutanisanyam1</span>) <a href="https://twitter.com/bhutanisanyam1/status/1168218396552351744?ref_src=twsrc%5Etfw">September 1, 2019</a>
+</blockquote>
+<script async="" src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+<section id="parte-1" class="level1">
+<h1>Parte 1</h1>
+<p>https://youtu.be/k-gZAyg5ib8?t=0 Introducción</p>
+<ul>
+<li>https://twitter.com/madeupmasters</li>
+<li>https://forums.fast.ai/t/things-jeremy-says-to-do/36682</li>
+</ul>
+<p>“Para lograr ser autodidacta se requiere ser consistente y un desafío balanceado”.</p>
+<p>Y hay que ver en teoría en una escuela “quieren que construyas un compilador antes antes de hacer una pieza útil de software”</p>
+<p>“La AI puede ser más flexible para detectar cambios en un audio que la programación tradicional” lo cual podría ser complicado de programar de manera imperativa o funcional.</p>
+<p>tomó los cursos * https://cs50.harvard.edu/college/2021/spring/ ó https://online-learning.harvard.edu/course/cs50-introduction-computer-science para principiantes en computación y amplio * https://www.coursera.org/learn/algorithms-part1 * https://www.coursera.org/learn/algorithms-part2 y probablemente sirva de algo el código de este libro https://algs4.cs.princeton.edu/home/ * https://www.coursera.org/learn/machine-learning by Andrew Ng</p>
+<p>“focus on building not on theory” “top-down approach”, en otras palabras es más practico hacer cosas que entender el trasfondo que puede ser más complejo y requerir de más análisis.</p>
+</section>
+<section id="parte-2" class="level1">
+<h1>parte 2</h1>
+<p>https://youtu.be/k-gZAyg5ib8?t=986 brincar a una competencia sin saber nada te da la libertad de experimentar lo que se te ocurra. Un punto interesante es que si tienes suficientes bases puedes explorar más libremente que sabiendo las herramientas default usadas o los modelos usados por defecto “un periodo de creatividad libre”, una de las estrategias que tomó en ese tiempo fue pasar la onda de audio directo al modelo y posteriormente se dió cuenta que tendría que conocer más acerca del procesamiento de señales para poder sacar más información del audio.</p>
+<p>“It is easy to get addicted to online classes” se puede entrar en un “ciclo infinito” de aprender que puede bloquear el de aplicar o hacer algo.</p>
+<p>https://hackernoon.com/how-not-to-do-fast-ai-or-any-ml-mooc-3d34a7e0ab8c</p>
+<p>“What should I don next? is to see what you have in your head and see what is stopping you, then learn that”, enforcarse en aprender sólo las cosas que te faltan por aprender es mejor, es como el eslabon más débil de la cadena siempre es el que se puede romper, hay que aprender a hacer objetivos basados en los “bloqueos” que nos encontramos en el camino.</p>
+<p>Kaggle te puede aislar hacia resolver el problema a la mano en vez de toparte con lo que es construir tu propio proyecto porque ya tienes de alguna forma los datos procesados y un objetivo, pero si no lo tienes todo de inicio puede resultar en otra forma de aprendizaje (¿talvez no es posible?, ¿los datos afectan?). Es mejor si se pueden hacer las dos cosas Kaggle+proyecto(s) propio(s).</p>
+<p>http://christinemcleavey.com/musenet/</p>
+</section>
+<section id="parte-3" class="level1">
+<h1>parte 3</h1>
+<p>https://youtu.be/k-gZAyg5ib8?t=1356</p>
+<p>El objetivo de fastai_audio es contruir un modulo que sea compatible con fastai con la misma usabilidad.</p>
+<p>Resnets y densenets parecen funcionar bien con FFTs y audio. Y se puede usar transfer learning desde imagenette aunque no tenga nada que ver con audio, probablemente porque las primeras capas reconocen líneas, direcciones y otras características básicas.</p>
+<p>Y a base de prueba y error los defaults en fastai_audio han sido puestos en la librería.</p>
+<p>Y en cuando a hacer cosas, es mejor hacerlas aunque tengan errores o no sean perfectas (o incluso aunque no las entiendas), talvez alguien más pueda ver el error y corregirlo. Si se espera a ser experto en el area antes de empezar algo, pues por lo menos falta llegar a ese punto primero sin hacer nada práctico de antemano. Y es bueno tener a alguién o algun recurso en quien confiar ya sea una persona, un foro en general alguién a quien poder preguntar aunque tal vez no tengan todas las respuestas.</p>
+<p>(SpecAugment: A Simple Data Augmentation Method for Automatic Speech Recognition][https://arxiv.org/abs/1904.08779] y https://ai.googleblog.com/2019/04/specaugment-new-data-augmentation.html</p>
+</section>
+<section id="parte-4" class="level1">
+<h1>parte 4</h1>
+<p>https://youtu.be/k-gZAyg5ib8?t=2730</p>
+<p>“consistency matters above all” la consistencia importa más que cualquier otra cosa, poner esfuerzo constante con días de descanso es mejor que hacer mucho en este momento, dejarlo, volver y que sobre esforzarse al punto de “quemarte”. “Intellectual work is exhausting” el trabajo intelectual es agotador, “I’m working from 8:00 a.m. to 2:00 p.m.” trabajo de las 8:00 a.m. a las 2:00 p.m. Con un tiempo más límitado tienes que enfocarte en hacer ciertas cosas y tomar decisiones en ese tiempo sin tener todo el tiempo del día para cosas “fribolas”.</p>
+
+
+</section>
+
+ ]]></description>
+  <category>fastchai</category>
+  <category>fastai</category>
+  <guid>https://github.com/tyoc213/blog/posts/2021-01-09-fastchai-rbracco-audio-y-estudio-propio.html</guid>
+  <pubDate>Sat, 09 Jan 2021 06:00:00 GMT</pubDate>
+</item>
+<item>
+  <title>¿Cómo reconocer las buenas ideas de investigación que valen tu tiempo y esfuerzo?</title>
+  <link>https://github.com/tyoc213/blog/posts/2021-01-02-reconociendo-una-buena-idea-de-investigacion.html</link>
+  <description><![CDATA[ 
+
+
+
+
+<blockquote class="twitter-tweet blockquote" data-dnt="true" data-theme="dark">
+<p lang="en" dir="ltr">
+How do you recognize good research ideas that are worth your time and effort? And how do you evaluate whether the hypotheses of others make sense? Here is my take:<br>1/ <a href="https://t.co/LKy8INNCRm">pic.twitter.com/LKy8INNCRm</a>
+</p>
+— Cecile Janssens (<span class="citation" data-cites="cecilejanssens">@cecilejanssens</span>) <a href="https://twitter.com/cecilejanssens/status/1232091252822364160?ref_src=twsrc%5Etfw">February 24, 2020</a>
+</blockquote>
+<script async="" src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+<p>Recordando que el método científico</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="https://github.com/tyoc213/blog/posts/images/Método_científico_2021.jpg" class="img-fluid figure-img"></p>
+<p></p><figcaption class="figure-caption">Método científico</figcaption><p></p>
+</figure>
+</div>
+<p>Hay una parte que es inductiva (se proponen hipotesis) y otra que es deductiva (se comprueba rigurosamente la conclusión a partir de las hipótesis).</p>
+<blockquote class="twitter-tweet blockquote" data-conversation="none" data-dnt="true" data-theme="dark">
+<p lang="en" dir="ltr">
+Doing science means following the scientific method. The hypotheses we choose to investigate (also in hypothesis-free research) follows from the rigor of our background research and a process that is called inductive reasoning. <a href="https://t.co/ojK18UTVK2">pic.twitter.com/ojK18UTVK2</a>
+</p>
+— Cecile Janssens (<span class="citation" data-cites="cecilejanssens">@cecilejanssens</span>) <a href="https://twitter.com/cecilejanssens/status/1232091258748841984?ref_src=twsrc%5Etfw">February 24, 2020</a>
+</blockquote>
+<script async="" src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+<p>La parte deductiva incluye: hacer una pregunta, investigar, hacer una hipotesis. La parte inductiva incluye: construir un experimiento para probar la hipotesis, analisar los datos/resultados y sacar una conclusión</p>
+<blockquote class="twitter-tweet blockquote" data-conversation="none" data-dnt="true" data-theme="dark">
+<p lang="en" dir="ltr">
+This case can be strong or weak. The case is cogent if we can rely on the premises to be true. A case can be made stronger with more supporting evidence from more background research, and weaker e.g., if new evidence contradicts. <a href="https://t.co/dz4ncNTFX5">pic.twitter.com/dz4ncNTFX5</a>
+</p>
+— Cecile Janssens (<span class="citation" data-cites="cecilejanssens">@cecilejanssens</span>) <a href="https://twitter.com/cecilejanssens/status/1232091277208014848?ref_src=twsrc%5Etfw">February 24, 2020</a>
+</blockquote>
+<script async="" src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+<p>Entonces, las premisas por lo menos antes de empezar a trabajar deberían de parecer validas (si no se tienen las pruebas) o en otras palabras ser “solidas” (“sound” en Inglés).</p>
+<blockquote class="twitter-tweet blockquote" data-conversation="none" data-dnt="true" data-theme="dark">
+<p lang="en" dir="ltr">
+Here are examples of evidence that are essential to justify that the diet might work (also the study protocol paper that they cite did not provide this evidence). <br>With a weak case, an RCT is more likely to show no benefit of the intervention (the diet didn't work). <a href="https://t.co/q8iiBKjofx">pic.twitter.com/q8iiBKjofx</a>
+</p>
+— Cecile Janssens (<span class="citation" data-cites="cecilejanssens">@cecilejanssens</span>) <a href="https://twitter.com/cecilejanssens/status/1232091314558242817?ref_src=twsrc%5Etfw">February 24, 2020</a>
+</blockquote>
+<script async="" src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+<p>Tambien si basas tu trabajo en otros que no proveen pruebas, talvez sea indicación de poco trabajo previo o mal trabajo previo.</p>
+<p>Entonces, se debe buscar tener un fuerte argumento a favor o por lo menos una corazonada fuerte de que al final del camino existe la razon para ocupar tu tiempo en ese argumento respecto a la pregunta inicial.</p>
+
+
+
+ ]]></description>
+  <category>note</category>
+  <guid>https://github.com/tyoc213/blog/posts/2021-01-02-reconociendo-una-buena-idea-de-investigacion.html</guid>
+  <pubDate>Sat, 02 Jan 2021 06:00:00 GMT</pubDate>
+  <media:content url="https://github.com/tyoc213/blog/posts/images/M%C3%A9todo_cient%C3%ADfico_2021.jpg" medium="image" type="image/jpeg"/>
+</item>
+<item>
+  <title>Finding nemo a bug journey</title>
+  <link>https://github.com/tyoc213/blog/posts/2020-12-13-finding nemo a bug journey.html</link>
+  <description><![CDATA[ 
+
+
+
+
+<section id="what-happened-at-first" class="level1">
+<h1>What happened at first</h1>
+<p>The major part of the last months we were trying to solve one bug that we didn’t know how to solve until this days, some time before fastai version 2 release having a POC and passing the hackathon we participated we left a little the project, but when we came back to it, there were some extrange things happening, some models where not training and apparently others where training, we didn’t understand what happened, in that time we thought we introduced an error in our code some way.</p>
+<section id="the-journey" class="level2">
+<h2 class="anchored" data-anchor-id="the-journey">The journey</h2>
+<p>So, these last few days since I had locally installed XLA and been able to run things, I planned to take a new round to find our bug and it was a perfect opportunity to test what having locally installed <code>pytorch</code>+<code>xla</code>+<code>fatai_xla_etensions</code> could do.</p>
+<p>So I passed a lot of assumptions to finally find the solution.</p>
+<ol start="0" type="1">
+<li>So after having locally installed XLA, one of the first things I wanted to test is if locally I could reproduce the error, and I could!</li>
+<li>The first one was that the error was in our code, but having locally XLA allowed me to test the exact same code changing the device to either: CPU, CUDA or XLA. So I ended up having 2 data loaders and 2 trains on the same python file. Also one main point was that I wrapped a Adam but from pytorch with <code>OptimWrapper</code> and it trained correctly so I was more suspicious of differences between the optimizer from fastai and the native to pytorch because there is one know difference about <code>__getstate__</code> that is also a requirement for TPU Pods.</li>
+<li>In the past we have also thought that it was a freeze unfreeze problem, but it was also discarded, so this time I was checking the optimizer, but could not find why the params were not training even when looking under the lens.</li>
+<li>But after more testings and so on, I see that the second example started to train correctly while the first on the file not, and it was that with all the fresh runs, so I thought it was a problem with the learner, but could not find a “real problem” so I returned back to the optimizer and all, but this time I have a new “tool” I learned, counting the trainable parameters so, the trainable parameters their gradients are updated when you call <code>backward</code>, so I started to count there and for the first example they where <strong>always zero</strong> while for the second run since start, they have a number. So the next task was to find why on the first the trainable parameters are always zero and the second not.</li>
+</ol>
+<p>But I still didn’t get why one model was training and the other one not!</p>
+<p>I passed <code>_BaseOptimizer</code>, <code>Optimizer</code>, <code>Learner</code> and others and still could not find the problem, so I decided to compare models and found the problem! I updated the example I found in pytorch forums https://discuss.pytorch.org/t/two-models-with-same-weights-different-results/8918/7 the original one at first run did break because it compared tensors not on same device, so it threw error, I modified it so that it prints them nicely instead of being caught in that error.</p>
+<div class="sourceCode" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><span class="kw" style="color: #003B4F;">def</span> compare_models(model_1, model_2):</span>
+<span id="cb1-2">    models_differ <span class="op" style="color: #5E5E5E;">=</span> <span class="dv" style="color: #AD0000;">0</span></span>
+<span id="cb1-3">    <span class="cf" style="color: #003B4F;">for</span> key_item_1, key_item_2 <span class="kw" style="color: #003B4F;">in</span> <span class="bu" style="color: null;">zip</span>(model_1.state_dict().items(), model_2.state_dict().items()):</span>
+<span id="cb1-4">        <span class="cf" style="color: #003B4F;">if</span> key_item_1[<span class="dv" style="color: #AD0000;">1</span>].device <span class="op" style="color: #5E5E5E;">==</span> key_item_2[<span class="dv" style="color: #AD0000;">1</span>].device  <span class="kw" style="color: #003B4F;">and</span> torch.equal(key_item_1[<span class="dv" style="color: #AD0000;">1</span>], key_item_2[<span class="dv" style="color: #AD0000;">1</span>]):</span>
+<span id="cb1-5">            <span class="cf" style="color: #003B4F;">pass</span></span>
+<span id="cb1-6">        <span class="cf" style="color: #003B4F;">else</span>:</span>
+<span id="cb1-7">            models_differ <span class="op" style="color: #5E5E5E;">+=</span> <span class="dv" style="color: #AD0000;">1</span></span>
+<span id="cb1-8">            <span class="cf" style="color: #003B4F;">if</span> (key_item_1[<span class="dv" style="color: #AD0000;">0</span>] <span class="op" style="color: #5E5E5E;">==</span> key_item_2[<span class="dv" style="color: #AD0000;">0</span>]):</span>
+<span id="cb1-9">                _device <span class="op" style="color: #5E5E5E;">=</span> <span class="ss" style="color: #20794D;">f'device </span><span class="sc" style="color: #5E5E5E;">{</span>key_item_1[<span class="dv" style="color: #AD0000;">1</span>]<span class="sc" style="color: #5E5E5E;">.</span>device<span class="sc" style="color: #5E5E5E;">}</span><span class="ss" style="color: #20794D;">, </span><span class="sc" style="color: #5E5E5E;">{</span>key_item_2[<span class="dv" style="color: #AD0000;">1</span>]<span class="sc" style="color: #5E5E5E;">.</span>device<span class="sc" style="color: #5E5E5E;">}</span><span class="ss" style="color: #20794D;">'</span> <span class="cf" style="color: #003B4F;">if</span> key_item_1[<span class="dv" style="color: #AD0000;">1</span>].device <span class="op" style="color: #5E5E5E;">!=</span> key_item_2[<span class="dv" style="color: #AD0000;">1</span>].device <span class="cf" style="color: #003B4F;">else</span> <span class="st" style="color: #20794D;">''</span></span>
+<span id="cb1-10">                <span class="bu" style="color: null;">print</span>(<span class="ss" style="color: #20794D;">f'Mismatch </span><span class="sc" style="color: #5E5E5E;">{</span>_device<span class="sc" style="color: #5E5E5E;">}</span><span class="ss" style="color: #20794D;"> found at'</span>, key_item_1[<span class="dv" style="color: #AD0000;">0</span>])</span>
+<span id="cb1-11">            <span class="cf" style="color: #003B4F;">else</span>:</span>
+<span id="cb1-12">                <span class="cf" style="color: #003B4F;">raise</span> <span class="pp" style="color: #AD0000;">Exception</span></span>
+<span id="cb1-13">    <span class="cf" style="color: #003B4F;">if</span> models_differ <span class="op" style="color: #5E5E5E;">==</span> <span class="dv" style="color: #AD0000;">0</span>:</span>
+<span id="cb1-14">        <span class="bu" style="color: null;">print</span>(<span class="st" style="color: #20794D;">'Models match perfectly! :)'</span>)</span></code></pre></div>
+<p>And that was the solution to the problem, I focused on seeing why the models parameters were on different devices. At the end I have something like (remember I don’t need to patch the optimizer because I have all installed locally).</p>
+<div class="sourceCode" id="cb2" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><span class="kw" style="color: #003B4F;">def</span> create_opt(<span class="va" style="color: #111111;">self</span>):</span>
+<span id="cb2-2">    <span class="bu" style="color: null;">print</span>(<span class="st" style="color: #20794D;">'trainable count before'</span>, <span class="bu" style="color: null;">len</span>(<span class="va" style="color: #111111;">self</span>.all_params(with_grad<span class="op" style="color: #5E5E5E;">=</span><span class="va" style="color: #111111;">True</span>)))</span>
+<span id="cb2-3">    <span class="va" style="color: #111111;">self</span>.opt <span class="op" style="color: #5E5E5E;">=</span> <span class="va" style="color: #111111;">self</span>.opt_func(<span class="va" style="color: #111111;">self</span>.splitter(<span class="va" style="color: #111111;">self</span>.model), lr<span class="op" style="color: #5E5E5E;">=</span><span class="va" style="color: #111111;">self</span>.lr)</span>
+<span id="cb2-4">    <span class="bu" style="color: null;">print</span>(<span class="st" style="color: #20794D;">'trainable count after'</span>, <span class="bu" style="color: null;">len</span>(<span class="va" style="color: #111111;">self</span>.all_params(with_grad<span class="op" style="color: #5E5E5E;">=</span><span class="va" style="color: #111111;">True</span>)))</span>
+<span id="cb2-5">    <span class="cf" style="color: #003B4F;">if</span> <span class="kw" style="color: #003B4F;">not</span> <span class="va" style="color: #111111;">self</span>.wd_bn_bias:</span>
+<span id="cb2-6">        <span class="cf" style="color: #003B4F;">for</span> p <span class="kw" style="color: #003B4F;">in</span> <span class="va" style="color: #111111;">self</span>._bn_bias_state(<span class="va" style="color: #111111;">True</span> ): p[<span class="st" style="color: #20794D;">'do_wd'</span>] <span class="op" style="color: #5E5E5E;">=</span> <span class="va" style="color: #111111;">False</span></span>
+<span id="cb2-7">    <span class="cf" style="color: #003B4F;">if</span> <span class="va" style="color: #111111;">self</span>.train_bn:</span>
+<span id="cb2-8">        <span class="cf" style="color: #003B4F;">for</span> p <span class="kw" style="color: #003B4F;">in</span> <span class="va" style="color: #111111;">self</span>._bn_bias_state(<span class="va" style="color: #111111;">False</span>): p[<span class="st" style="color: #20794D;">'force_train'</span>] <span class="op" style="color: #5E5E5E;">=</span> <span class="va" style="color: #111111;">True</span></span></code></pre></div>
+<p>and</p>
+<div class="sourceCode" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1">        <span class="bu" style="color: null;">print</span>(<span class="st" style="color: #20794D;">'trainable count before backward'</span>, <span class="bu" style="color: null;">len</span>(<span class="va" style="color: #111111;">self</span>.all_params(with_grad<span class="op" style="color: #5E5E5E;">=</span><span class="va" style="color: #111111;">True</span>)))</span>
+<span id="cb3-2">        <span class="va" style="color: #111111;">self</span>(<span class="st" style="color: #20794D;">'before_backward'</span>)</span>
+<span id="cb3-3">        <span class="bu" style="color: null;">print</span>(<span class="st" style="color: #20794D;">'trainable count before backward'</span>, <span class="bu" style="color: null;">len</span>(<span class="va" style="color: #111111;">self</span>.all_params(with_grad<span class="op" style="color: #5E5E5E;">=</span><span class="va" style="color: #111111;">True</span>)))</span>
+<span id="cb3-4">        <span class="va" style="color: #111111;">self</span>._backward()</span>
+<span id="cb3-5">        <span class="va" style="color: #111111;">self</span>(<span class="st" style="color: #20794D;">'after_backward'</span>)</span></code></pre></div>
+<p>So at the end I see that even that the model is moved later to the device, the first time when <code>splitter=trainable_params</code> in <code>self.opt = self.opt_func(self.splitter(self.model), lr=self.lr)</code> inside <code>create_opt</code> it is not there, so the parameters where stuck on CPU while the the data and the model is later moved to the XLA device.</p>
+<p>This does not affects GPUs, but thinking about it could mean also something about the pickable behaviour of xla tensors, specially the optimizer, but that is an history for another time, right now, we have again a simple lib that works for <code>Single-device TPUs</code> where you need to modify zero code from fastai.</p>
+</section>
+<section id="conclusion" class="level2">
+<h2 class="anchored" data-anchor-id="conclusion">Conclusion</h2>
+<p>So the model need to be in TPU/XLA device before their parameters are taked by splitter on <code>Optimizer</code> initialization, I guess we assumed some things in between then and now. At the end it was not exactly an error but was. But sure it was difficult to track, now knowing what it is is solved and we can continue forward.</p>
+<p>I hope to add in the next release a <code>show_lowering_ops</code> (or similar) to print the counters if you have hit some of those and it is easy to print in a model that runs with this activated. The <a href="https://github.com/butchland/fastai_xla_extensions/blob/master/samples/MNIST_TPU_demo.ipynb">MNIST demo</a> should be working again don’t forget to peek at <a href="https://github.com/butchland/fastai_xla_extensions/">fastai_xla_extensions</a>.</p>
+<p>EXTRA NOTE: But there was error because XLA model on CPU not trained when updating backward from data operations on XLA device? well, now I think that XLA worked on TPU with model and data copied to TPU on first time but somehow our model got stuck on CPU so not trained, it became another model separate from the execution happening on TPU (I can think of pickable things, but that is unknown at the moment)</p>
+
+
+</section>
+</section>
+
+ ]]></description>
+  <guid>https://github.com/tyoc213/blog/posts/2020-12-13-finding nemo a bug journey.html</guid>
+  <pubDate>Sun, 13 Dec 2020 06:00:00 GMT</pubDate>
+</item>
+<item>
+  <title>Compiling xla locally</title>
+  <link>https://github.com/tyoc213/blog/posts/2020-11-28-compiling-xla-locally.html</link>
+  <description><![CDATA[ 
+
+
+
+
+<section id="introduction" class="level1">
+<h1>Introduction</h1>
+<p>Since the time I found some issues mentioning GPU support https://github.com/pytorch/xla/ I was wondering when I could use it locally because a little group at fastai community have been trying to give support to fastai and hopefully being able to run locally would be useful for that end.</p>
+</section>
+<section id="running-gpu-support-with-a-docker-image" class="level1">
+<h1>Running GPU support with a docker image</h1>
+<p>So the first thing was to run it with the docker image which if you have installed <a href="https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html">container-toolkit/install-guide</a> and then running something like <code>docker run --gpus all -it --shm-size 16G gcr.io/tpu-pytorch/xla@sha256:efe47b7a3875ddfa3ea9c68a12ed5517c19cbb3cf272776fba64bec8a683299f</code> or the sha or nightly you want to run like <code>gcr.io/tpu-pytorch/xla@nightly</code>.</p>
+<p>After I ran that, I compiled the source as <a href="https://github.com/pytorch/xla/blob/master/CONTRIBUTING.md">xla-instructions</a> inside that image and after some hours I could see a “hello” I have made on a cpp file <strong>wonderful!!!</strong>. But it seems that all that work would be lost on the next startup, so after watch building it and ran successfully I decided to give a go into building on my own computer (if you still need that then maybe check <code>docker commit xxxxx</code> and <code>docker checkpoint</code>).</p>
+</section>
+<section id="compiling-locally" class="level1">
+<h1>Compiling locally</h1>
+<p>To compile locally I have lurked and tested different ways, first time I build it was just with CPU support which I didn’t notice (some env vars where missing), so long history short I have made a new environment with conda like <code>conda create -n xla python=3.6</code> and worked inside this env.</p>
+<section id="installing-needed-things" class="level2">
+<h2 class="anchored" data-anchor-id="installing-needed-things">Installing needed things</h2>
+<p>Probably I miss something, but I have to install</p>
+<ul>
+<li>Don’t use the cuda from apt, use <a href="https://developer.nvidia.com/cuda-downloads">directly from nvidia</a> and install only sdk with <code>sudo sh PATH_CUDA_DRIVERS --silent --toolkit</code> it will be installed to <code>/usr/local/cuda</code> which is where it should be located (if you let Ubuntu handle installation of drivers this <code>--toolkit</code> will not erase that and only install sdk so when updating kernel no need to reinstall).</li>
+<li>Install <a href="https://docs.nvidia.com/deeplearning/cudnn/install-guide/index.html">cuddn from NVIDIA from zip</a> file and copy all h files and libs</li>
+</ul>
+<pre><code>sudo cp cuda/include/cudnn.h /usr/local/cuda/include
+sudo cp cuda/include/cudnn.h /usr/local/cuda/include
+sudo cp cuda/lib64/libcudnn* /usr/local/cuda/lib64
+sudo cp cuda/include/cudnn_version.h /usr/local/cuda/include
+sudo cp cuda/include/cudnn_backend.h /usr/local/cuda/include
+sudo cp cuda/include/cudnn_adv_infer.h /usr/local/cuda/include
+sudo cp cuda/include/cudnn_adv_train.h /usr/local/cuda/include
+sudo cp cuda/include/cudnn_cnn_infer.h /usr/local/cuda/include
+sudo cp cuda/include/cudnn_cnn_train.h /usr/local/cuda/include
+sudo cp cuda/include/cudnn_ops_infer.h /usr/local/cuda/include
+sudo cp cuda/include/cudnn_ops_train.h /usr/local/cuda/include
+sudo cp cuda/include/cudnn.h /usr/local/cuda/include</code></pre>
+<ul>
+<li>Install <code>sudo apt-get install cmake</code></li>
+<li><a href="https://golang.org/doc/install">Install go</a> to install <code>go get github.com/bazelbuild/bazelisk</code> and then make if you cant run <code>bazel</code> from command line make a <code>ln -s /home/tyoc213/go/bin/bazelisk /home/tyoc213/go/bin/bazel</code> because bazel is needed in the path.</li>
+<li><code>sudo apt-get install clang-8 clang++-8</code></li>
+<li><code>pip install lark-parser</code></li>
+<li><code>conda install -c pytorch magma-cuda110</code> In my case I have <code>CUDA Version: 11.0</code> so I used <code>110</code></li>
+</ul>
+</section>
+<section id="get-the-sources" class="level2">
+<h2 class="anchored" data-anchor-id="get-the-sources">Get the sources</h2>
+<div class="sourceCode" id="cb2" style="background: #f1f3f5;"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><span class="fu" style="color: #4758AB;">git</span> clone <span class="at" style="color: #657422;">--recursive</span> https://github.com/pytorch/pytorch</span>
+<span id="cb2-2"><span class="bu" style="color: null;">cd</span> pytorch/</span>
+<span id="cb2-3"><span class="fu" style="color: #4758AB;">git</span> clone <span class="at" style="color: #657422;">--recursive</span> https://github.com/pytorch/xla.git</span>
+<span id="cb2-4"><span class="bu" style="color: null;">cd</span> xla</span>
+<span id="cb2-5"><span class="ex" style="color: null;">xla/scripts/apply_patches.sh</span></span></code></pre></div>
+<p>The last lines apply xla needed patches. Now you are ready to compile, but wait!!! what is missing is all the configuration that lets you build inside the docker container!</p>
+</section>
+<section id="environment-vars" class="level2">
+<h2 class="anchored" data-anchor-id="environment-vars">Environment vars</h2>
+<p>Which are the things I fighted most:</p>
+<pre><code>export CMAKE_PREFIX_PATH=${CONDA_PREFIX:-"$(dirname $(which conda))/../"}
+export TF_CUDA_COMPUTE_CAPABILITIES="7.0,7.5"
+export CXX_ABI=0
+export cxx_abi=0
+export GPU_NUM_DEVICES=1
+export cuda=1 # new
+export USE_CUDA=1
+export XLA_CUDA=1
+export XLA_DEBUG=1
+export XLA_BAZEL_VERBOSE=0
+export CXX=clang++-8
+export CC=clang-8
+export GLIBCXX_USE_CXX11_ABI=0
+export CFLAGS="${CFLAGS} -D_GLIBCXX_USE_CXX11_ABI=0"
+export CXXFLAGS="${CXXFLAGS} -D_GLIBCXX_USE_CXX11_ABI=0"
+export PATH=/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/go/bin:/home/tyoc213/go/bin:/home/tyoc213/miniconda3/envs/xla/include:$PATH</code></pre>
+<p>Probably some of them are not needed, but this worked out. Also this is not all that is needed, there is one extra set of commands needed because if not the lib will mix CXX11_ABI so it will not link (and you will not know after hours). To apply this inside the <code>pytorch</code> directory:</p>
+<pre><code>sed -i '/include(CMakeDependentOption)/i set(GLIBCXX_USE_CXX11_ABI 0)' CMakeLists.txt
+sed -i 's/set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -fPIC")/set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -fPIC -D_GLIBCXX_USE_CXX11_ABI=0")/g' third_party/gloo/CMakeLists.txt
+sed -i '/gloo_list_append_if_unique(CUDA_NVCC_FLAGS "-Xcompiler" "-fPIC")/i gloo_list_append_if_unique(CUDA_NVCC_FLAGS "-Xcompiler" "-D_GLIBCXX_USE_CXX11_ABI=0")' third_party/gloo/cmake/Cuda.cmake
+</code></pre>
+</section>
+<section id="building" class="level2">
+<h2 class="anchored" data-anchor-id="building">Building</h2>
+<p>So that is all needed if I didn’t miss something. So now we are ready to build this this, start at the top level pytorch:</p>
+<pre><code>(xla) tyoc213@u:~/Documents/github/pytorch$ python setup.py install
+(xla) tyoc213@u:~/Documents/github/pytorch$ cd xla
+(xla) tyoc213@u:~/Documents/github/pytorch/xla$ python setup.py install</code></pre>
+<p>In my 2015 CPU <code>Intel(R) Core(TM) i5-6500 CPU @ 3.20GHz</code> it taked like 2-4 hours compiling pytorch and then 8-10 hours compiling xla (which compiles internally TF).</p>
+</section>
+<section id="finally-running" class="level2">
+<h2 class="anchored" data-anchor-id="finally-running">Finally running</h2>
+<p>SO now that you have a working xla locally, you need to setup some extra vars to configure XLA for 1 GPU</p>
+<pre><code>export XRT_WORKERS="localservice:0;grpc://localhost:40934"
+export XRT_DEVICE_MAP="CPU:0;/job:localservice/replica:0/task:0/device:XLA_CPU:0|GPU:0;/job:localservice/replica:0/task:0/device:XLA_GPU:0"</code></pre>
+<p>If you have 4 GPUs, then use <code>export XRT_DEVICE_MAP="CPU:0;/job:localservice/replica:0/task:0/device:XLA_CPU:0|GPU:0;/job:localservice/replica:0/task:0/device:XLA_GPU:0|GPU:1;/job:localservice/replica:0/task:0/device:XLA_GPU:1|GPU:2;/job:localservice/replica:0/task:0/device:XLA_GPU:2|GPU:3;/job:localservice/replica:0/task:0/device:XLA_GPU:3"</code></p>
+</section>
+</section>
+<section id="why-all-this" class="level1">
+<h1>Why All this?</h1>
+<p>Having xla TPU support is still a missing and wanted feature of <a href="https://docs.fast.ai/">fastai</a>, some months a go <a href="https://twitter.com/butchland">Butch Landingin</a> and <a href="https://twitter.com/tyoc213">I</a> joined a hackathon to have a little reusable library it worked as a POC and in some moments we did have something working prior fastai 2 release but later we have found “extrange quirks” that have been difficult to track. And lately we have joined forces with <a href="iScienceLuvr">Tanishq Mathew Abraham</a> who has been working in his own support for fastai, so hopefully this time we can make this work.</p>
+<p>This was the first capture on Nov 26, see how the name says “compute” while on a 2080 <img src="https://github.com/tyoc213/blog/posts/images/xla_run.png" class="img-fluid" alt="first xla run"></p>
+<section id="the-good-parts" class="level2">
+<h2 class="anchored" data-anchor-id="the-good-parts">The good parts</h2>
+<p>the * It also means that we can have XLA tests running without TPU on a GPU and you don’t need to compile, only get latest build and run on docker GPU, or locally with full compiling as explained above. * XLA GPU optimizations could maybe help your current work? and maybe some things can be tested locally before running full production on the cloud. * The operations sended back to run on CPU locally <strong>feel</strong> not much slow as they are on TPUs just saying that maybe is more expensive to send ops to CPU on TPU that locally, but havent made a lot of tests and this should be only until all the ops are lowered to TPU. * Have all locally allows to change things like you want, for example I can see the slowness of TPU operations inside the fastai loop with chrome://tracing/ modyfing learner and running the XLA-GPU. And have already found a issue haven’t noticed in latest commits.</p>
+</section>
+<section id="the-bad-parts" class="level2">
+<h2 class="anchored" data-anchor-id="the-bad-parts">The bad parts</h2>
+<ul>
+<li>I have been only able to step/debug on python code, not on CPP (but hopefully someone that read this knows a tip to check my vscode settings).</li>
+<li>maybe I forgot something more specific in these instructions, but if you find an error, please share.</li>
+</ul>
+</section>
+</section>
+<section id="references" class="level1">
+<h1>References</h1>
+<ul>
+<li>First hint that xla run on GPU <a href="https://github.com/pytorch/xla/issues/2272">GPU support in PyTorch XLA</a></li>
+<li>This week I spammed the guys at xla <a href="https://github.com/pytorch/xla/issues/2642">Running locally</a> which foes first into running with docker, then locally.</li>
+<li>The last missing part, the sed <a href="https://github.com/pytorch/pytorch/issues/31943#issuecomment-637770008">error when building pytorch 1.1.0 from source</a></li>
+<li>Most of the build steps are on <a href="https://github.com/pytorch/xla/blob/master/CONTRIBUTING.md">xla/CONTRIBUTING</a></li>
+</ul>
+
+
+</section>
+
+ ]]></description>
+  <guid>https://github.com/tyoc213/blog/posts/2020-11-28-compiling-xla-locally.html</guid>
+  <pubDate>Sat, 28 Nov 2020 06:00:00 GMT</pubDate>
+  <media:content url="https://github.com/tyoc213/blog/posts/images/xla_run.png" medium="image" type="image/png" height="254" width="144"/>
+</item>
+<item>
+  <title>librosa 2015 presentation updated calls</title>
+  <link>https://github.com/tyoc213/blog/posts/2020-09-26-librosa-2015-presentation-updated-calls.html</link>
+  <description><![CDATA[ 
+
+
+
+
+<p>From https://www.youtube.com/watch?v=MhOdbtPhbLU in 2015</p>
+<p>I also copy &amp; paste some captures (they look weird) to see how different it was 5 years a go.</p>
+<div class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><span class="op" style="color: #5E5E5E;">%</span>matplotlib inline</span>
+<span id="cb1-2"><span class="im" style="color: #00769E;">import</span> matplotlib.pyplot <span class="im" style="color: #00769E;">as</span> plt</span>
+<span id="cb1-3"><span class="im" style="color: #00769E;">import</span> seaborn</span>
+<span id="cb1-4"></span>
+<span id="cb1-5">seaborn.<span class="bu" style="color: null;">set</span>(style<span class="op" style="color: #5E5E5E;">=</span><span class="st" style="color: #20794D;">'ticks'</span>)</span>
+<span id="cb1-6"><span class="im" style="color: #00769E;">from</span> IPython.display <span class="im" style="color: #00769E;">import</span> Audio</span>
+<span id="cb1-7"></span>
+<span id="cb1-8"><span class="im" style="color: #00769E;">import</span> numpy <span class="im" style="color: #00769E;">as</span> np</span>
+<span id="cb1-9"><span class="im" style="color: #00769E;">import</span> scipy</span>
+<span id="cb1-10"></span>
+<span id="cb1-11"><span class="im" style="color: #00769E;">import</span> mir_eval</span>
+<span id="cb1-12"></span>
+<span id="cb1-13"><span class="im" style="color: #00769E;">import</span> librosa</span>
+<span id="cb1-14"><span class="im" style="color: #00769E;">import</span> librosa.display</span></code></pre></div>
+</div>
+<div class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb2" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1">y,sr <span class="op" style="color: #5E5E5E;">=</span> librosa.load(librosa.util.example_audio_file())</span></code></pre></div>
+</div>
+<div class="callout-important callout callout-style-default callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>I removed all the outputs of Audio(data=,rate=) because the notebook was more than 19Mb total</p>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1">Audio(data<span class="op" style="color: #5E5E5E;">=</span>y,rate<span class="op" style="color: #5E5E5E;">=</span>sr) <span class="co" style="color: #5E5E5E;"># cleaned just to lower size of notebook (run again to see embeded player)</span></span></code></pre></div>
+</div>
+<section id="waveform" class="level3">
+<h3 class="anchored" data-anchor-id="waveform">waveform</h3>
+<div class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb4" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1">librosa.display.waveplot(y, sr)</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="4">
+<pre><code>&lt;matplotlib.collections.PolyCollection at 0x7fcb930f68b0&gt;</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="https://github.com/tyoc213/blog/posts/2020-09-26-Librosa-2015-presentation-updated-calls_files/figure-html/cell-5-output-2.png" class="img-fluid"></p>
+</div>
+</div>
+</section>
+<section id="spectrograms" class="level3">
+<h3 class="anchored" data-anchor-id="spectrograms">spectrograms</h3>
+<div class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb6" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1">D <span class="op" style="color: #5E5E5E;">=</span> librosa.stft(y)</span>
+<span id="cb6-2">D.shape</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="5">
+<pre><code>(1025, 2647)</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb8" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1">log_spectrogram <span class="op" style="color: #5E5E5E;">=</span> librosa.power_to_db(D<span class="op" style="color: #5E5E5E;">**</span><span class="dv" style="color: #AD0000;">2</span>, ref<span class="op" style="color: #5E5E5E;">=</span>np.<span class="bu" style="color: null;">max</span>)</span>
+<span id="cb8-2">log_spectrogram.shape</span></code></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>/home/tyoc213/miniconda3/envs/fastai/lib/python3.8/site-packages/librosa/core/spectrum.py:1544: UserWarning: power_to_db was called on complex input so phase information will be discarded. To suppress this warning, call power_to_db(np.abs(D)**2) instead.
+  warnings.warn(</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="6">
+<pre><code>(1025, 2647)</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb11" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1">librosa.display.specshow(log_spectrogram, x_axis<span class="op" style="color: #5E5E5E;">=</span><span class="st" style="color: #20794D;">'time'</span>, y_axis<span class="op" style="color: #5E5E5E;">=</span><span class="st" style="color: #20794D;">'linear'</span>)</span>
+<span id="cb11-2">plt.colorbar()</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="7">
+<pre><code>&lt;matplotlib.colorbar.Colorbar at 0x7fcb93009370&gt;</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="https://github.com/tyoc213/blog/posts/2020-09-26-Librosa-2015-presentation-updated-calls_files/figure-html/cell-8-output-2.png" class="img-fluid"></p>
+</div>
+</div>
+<div class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb13" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1">librosa.display.specshow(log_spectrogram, x_axis<span class="op" style="color: #5E5E5E;">=</span><span class="st" style="color: #20794D;">'time'</span>, y_axis<span class="op" style="color: #5E5E5E;">=</span><span class="st" style="color: #20794D;">'log'</span>)</span>
+<span id="cb13-2">plt.colorbar()</span></code></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>/home/tyoc213/miniconda3/envs/fastai/lib/python3.8/site-packages/librosa/display.py:974: MatplotlibDeprecationWarning: The 'basey' parameter of __init__() has been renamed 'base' since Matplotlib 3.3; support for the old name will be dropped two minor releases later.
+  scaler(mode, **kwargs)
+/home/tyoc213/miniconda3/envs/fastai/lib/python3.8/site-packages/librosa/display.py:974: MatplotlibDeprecationWarning: The 'linthreshy' parameter of __init__() has been renamed 'linthresh' since Matplotlib 3.3; support for the old name will be dropped two minor releases later.
+  scaler(mode, **kwargs)
+/home/tyoc213/miniconda3/envs/fastai/lib/python3.8/site-packages/librosa/display.py:974: MatplotlibDeprecationWarning: The 'linscaley' parameter of __init__() has been renamed 'linscale' since Matplotlib 3.3; support for the old name will be dropped two minor releases later.
+  scaler(mode, **kwargs)</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="8">
+<pre><code>&lt;matplotlib.colorbar.Colorbar at 0x7fcb92f4e0a0&gt;</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="https://github.com/tyoc213/blog/posts/2020-09-26-Librosa-2015-presentation-updated-calls_files/figure-html/cell-9-output-3.png" class="img-fluid"></p>
+</div>
+</div>
+</section>
+<section id="constant-q-transform" class="level3">
+<h3 class="anchored" data-anchor-id="constant-q-transform">Constant q transform</h3>
+<p>direct log-frecuency analysis?</p>
+<div class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb16" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1">C <span class="op" style="color: #5E5E5E;">=</span> librosa.cqt(y, sr)</span>
+<span id="cb16-2">C.shape</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="9">
+<pre><code>(84, 2647)</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb18" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1">librosa.display.specshow(librosa.amplitude_to_db(C<span class="op" style="color: #5E5E5E;">**</span><span class="dv" style="color: #AD0000;">2</span>), x_axis<span class="op" style="color: #5E5E5E;">=</span><span class="st" style="color: #20794D;">'time'</span>, y_axis<span class="op" style="color: #5E5E5E;">=</span><span class="st" style="color: #20794D;">'cqt_hz'</span>)</span>
+<span id="cb18-2">plt.colorbar()</span></code></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>/home/tyoc213/miniconda3/envs/fastai/lib/python3.8/site-packages/librosa/core/spectrum.py:1641: UserWarning: amplitude_to_db was called on complex input so phase information will be discarded. To suppress this warning, call amplitude_to_db(np.abs(S)) instead.
+  warnings.warn(</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="10">
+<pre><code>&lt;matplotlib.colorbar.Colorbar at 0x7fcb92e887c0&gt;</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="https://github.com/tyoc213/blog/posts/2020-09-26-Librosa-2015-presentation-updated-calls_files/figure-html/cell-11-output-3.png" class="img-fluid"></p>
+</div>
+</div>
+<p><img alt="TK: add title" width="774" caption="TK: add title" id="TK: add it" src="https://github.com/tyoc213/blog/posts/images/att_00000.png"></p>
+<div class="cell" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb21" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1">librosa.display.specshow(librosa.amplitude_to_db(C<span class="op" style="color: #5E5E5E;">**</span><span class="dv" style="color: #AD0000;">2</span>, top_db<span class="op" style="color: #5E5E5E;">=</span><span class="dv" style="color: #AD0000;">40</span>), x_axis<span class="op" style="color: #5E5E5E;">=</span><span class="st" style="color: #20794D;">'time'</span>, y_axis<span class="op" style="color: #5E5E5E;">=</span><span class="st" style="color: #20794D;">'cqt_note'</span>)</span>
+<span id="cb21-2">plt.colorbar()</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="11">
+<pre><code>&lt;matplotlib.colorbar.Colorbar at 0x7fcb92d0f0d0&gt;</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="https://github.com/tyoc213/blog/posts/2020-09-26-Librosa-2015-presentation-updated-calls_files/figure-html/cell-12-output-2.png" class="img-fluid"></p>
+</div>
+</div>
+<p><img alt="TK: add title" width="737" caption="TK: add title" id="TK: add it" src="https://github.com/tyoc213/blog/posts/images/att_00001.png"></p>
+</section>
+<section id="spectral-features" class="level3">
+<h3 class="anchored" data-anchor-id="spectral-features">Spectral features</h3>
+<p>Spectral features are often used to analyze harmony or timbre.</p>
+<p>Usually the product of a spectrogram and a filter bank.</p>
+</section>
+<section id="pitch-vs-class" class="level3">
+<h3 class="anchored" data-anchor-id="pitch-vs-class">pitch vs class</h3>
+<p>CQT measures the energy in each pitch.</p>
+<p>Chroma measures the energy in each pitch class.</p>
+<div class="cell" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb23" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1">chroma <span class="op" style="color: #5E5E5E;">=</span> librosa.feature.chroma_cqt(C<span class="op" style="color: #5E5E5E;">=</span>C, sr<span class="op" style="color: #5E5E5E;">=</span>sr)</span>
+<span id="cb23-2">chroma.shape</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="12">
+<pre><code>(12, 2647)</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb25" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1">librosa.display.specshow(chroma, x_axis<span class="op" style="color: #5E5E5E;">=</span><span class="st" style="color: #20794D;">'time'</span>, y_axis<span class="op" style="color: #5E5E5E;">=</span><span class="st" style="color: #20794D;">'chroma'</span>)</span>
+<span id="cb25-2">plt.colorbar()</span></code></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>/home/tyoc213/miniconda3/envs/fastai/lib/python3.8/site-packages/librosa/display.py:822: UserWarning: Trying to display complex-valued input. Showing magnitude instead.
+  warnings.warn(</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="13">
+<pre><code>&lt;matplotlib.colorbar.Colorbar at 0x7fcb906852b0&gt;</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="https://github.com/tyoc213/blog/posts/2020-09-26-Librosa-2015-presentation-updated-calls_files/figure-html/cell-14-output-3.png" class="img-fluid"></p>
+</div>
+</div>
+<p><img alt="TK: add title" width="715" caption="TK: add title" id="TK: add it" src="https://github.com/tyoc213/blog/posts/images/att_00002.png"></p>
+<p>Other spectral features includes MEL spectra, MFCC and Tonnetz</p>
+<div class="cell" data-execution_count="14">
+<div class="sourceCode cell-code" id="cb28" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1">M <span class="op" style="color: #5E5E5E;">=</span> librosa.feature.melspectrogram(y<span class="op" style="color: #5E5E5E;">=</span>y, sr<span class="op" style="color: #5E5E5E;">=</span>sr)</span>
+<span id="cb28-2">MFCC <span class="op" style="color: #5E5E5E;">=</span> librosa.feature.mfcc(y<span class="op" style="color: #5E5E5E;">=</span>y, sr<span class="op" style="color: #5E5E5E;">=</span>sr)</span>
+<span id="cb28-3">tonnetz <span class="op" style="color: #5E5E5E;">=</span> librosa.feature.tonnetz(y<span class="op" style="color: #5E5E5E;">=</span>y, sr<span class="op" style="color: #5E5E5E;">=</span>sr)</span></code></pre></div>
+</div>
+</section>
+<section id="audio-effects" class="level3">
+<h3 class="anchored" data-anchor-id="audio-effects">Audio effects</h3>
+<div class="cell" data-execution_count="15">
+<div class="sourceCode cell-code" id="cb29" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1">y_harmonic, y_percussive <span class="op" style="color: #5E5E5E;">=</span> librosa.effects.hpss(y)</span></code></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb30" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1">Audio(data<span class="op" style="color: #5E5E5E;">=</span>y, rate<span class="op" style="color: #5E5E5E;">=</span>sr)</span></code></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb31" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1">Audio(data<span class="op" style="color: #5E5E5E;">=</span>y_harmonic, rate<span class="op" style="color: #5E5E5E;">=</span>sr)</span></code></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb32" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1">Audio(data<span class="op" style="color: #5E5E5E;">=</span>y_percussive, rate<span class="op" style="color: #5E5E5E;">=</span>sr)</span></code></pre></div>
+</div>
+<div class="cell" data-execution_count="19">
+<div class="sourceCode cell-code" id="cb33" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1">plt.figure(figsize<span class="op" style="color: #5E5E5E;">=</span>(<span class="dv" style="color: #AD0000;">12</span>,<span class="dv" style="color: #AD0000;">6</span>))</span>
+<span id="cb33-2">C_harmonic <span class="op" style="color: #5E5E5E;">=</span> librosa.cqt(y_harmonic, sr)</span>
+<span id="cb33-3">C_perc <span class="op" style="color: #5E5E5E;">=</span> librosa.cqt(y_percussive, sr)</span>
+<span id="cb33-4"></span>
+<span id="cb33-5">plt.subplot(<span class="dv" style="color: #AD0000;">3</span>,<span class="dv" style="color: #AD0000;">1</span>,<span class="dv" style="color: #AD0000;">1</span>), librosa.display.specshow(C<span class="op" style="color: #5E5E5E;">**</span>(<span class="fl" style="color: #AD0000;">1.</span><span class="op" style="color: #5E5E5E;">/</span><span class="dv" style="color: #AD0000;">3</span>), y_axis<span class="op" style="color: #5E5E5E;">=</span><span class="st" style="color: #20794D;">'cqt_hz'</span>), plt.colorbar()</span>
+<span id="cb33-6">plt.subplot(<span class="dv" style="color: #AD0000;">3</span>,<span class="dv" style="color: #AD0000;">1</span>,<span class="dv" style="color: #AD0000;">2</span>), librosa.display.specshow(C_harmonic<span class="op" style="color: #5E5E5E;">**</span>(<span class="fl" style="color: #AD0000;">1.</span><span class="op" style="color: #5E5E5E;">/</span><span class="dv" style="color: #AD0000;">3</span>), y_axis<span class="op" style="color: #5E5E5E;">=</span><span class="st" style="color: #20794D;">'cqt_hz'</span>), plt.colorbar()</span>
+<span id="cb33-7">plt.subplot(<span class="dv" style="color: #AD0000;">3</span>,<span class="dv" style="color: #AD0000;">1</span>,<span class="dv" style="color: #AD0000;">3</span>), librosa.display.specshow(C_perc<span class="op" style="color: #5E5E5E;">**</span>(<span class="fl" style="color: #AD0000;">1.</span><span class="op" style="color: #5E5E5E;">/</span><span class="dv" style="color: #AD0000;">3</span>), y_axis<span class="op" style="color: #5E5E5E;">=</span><span class="st" style="color: #20794D;">'cqt_hz'</span>), plt.colorbar()</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="19">
+<pre><code>(&lt;AxesSubplot:ylabel='Hz'&gt;,
+ &lt;matplotlib.collections.QuadMesh at 0x7fcb92d88d90&gt;,
+ &lt;matplotlib.colorbar.Colorbar at 0x7fcb92df3a00&gt;)</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="https://github.com/tyoc213/blog/posts/2020-09-26-Librosa-2015-presentation-updated-calls_files/figure-html/cell-20-output-2.png" class="img-fluid"></p>
+</div>
+</div>
+</section>
+<section id="onsets-and-beats" class="level3">
+<h3 class="anchored" data-anchor-id="onsets-and-beats">Onsets and beats</h3>
+<div class="cell" data-execution_count="20">
+<div class="sourceCode cell-code" id="cb35" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1">onset_envelope <span class="op" style="color: #5E5E5E;">=</span> librosa.onset.onset_strength(y, sr)</span></code></pre></div>
+</div>
+<div class="cell" data-execution_count="21">
+<div class="sourceCode cell-code" id="cb36" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1">onsets <span class="op" style="color: #5E5E5E;">=</span> librosa.onset.onset_detect(onset_envelope<span class="op" style="color: #5E5E5E;">=</span>onset_envelope)</span></code></pre></div>
+</div>
+<div class="cell" data-execution_count="22">
+<div class="sourceCode cell-code" id="cb37" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1">plt.subplot(<span class="dv" style="color: #AD0000;">2</span>,<span class="dv" style="color: #AD0000;">1</span>,<span class="dv" style="color: #AD0000;">1</span>)</span>
+<span id="cb37-2">plt.plot(onset_envelope, label<span class="op" style="color: #5E5E5E;">=</span><span class="st" style="color: #20794D;">'Onset strength'</span>)</span>
+<span id="cb37-3">plt.vlines(onsets, <span class="dv" style="color: #AD0000;">0</span>, onset_envelope.<span class="bu" style="color: null;">max</span>(), color<span class="op" style="color: #5E5E5E;">=</span><span class="st" style="color: #20794D;">'r'</span>, alpha<span class="op" style="color: #5E5E5E;">=</span><span class="fl" style="color: #AD0000;">0.25</span>, label<span class="op" style="color: #5E5E5E;">=</span><span class="st" style="color: #20794D;">'onsets'</span>)</span>
+<span id="cb37-4">plt.xticks([]), plt.yticks([])</span>
+<span id="cb37-5">plt.legend(frameon<span class="op" style="color: #5E5E5E;">=</span><span class="va" style="color: #111111;">True</span>)</span>
+<span id="cb37-6">plt.axis(<span class="st" style="color: #20794D;">'tight'</span>)</span>
+<span id="cb37-7"></span>
+<span id="cb37-8">plt.subplot(<span class="dv" style="color: #AD0000;">2</span>,<span class="dv" style="color: #AD0000;">1</span>,<span class="dv" style="color: #AD0000;">2</span>)</span>
+<span id="cb37-9">librosa.display.waveplot(y, sr)</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="22">
+<pre><code>&lt;matplotlib.collections.PolyCollection at 0x7fcb93b6a220&gt;</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="https://github.com/tyoc213/blog/posts/2020-09-26-Librosa-2015-presentation-updated-calls_files/figure-html/cell-23-output-2.png" class="img-fluid"></p>
+</div>
+</div>
+<p>onset stregth is used to track beats and estimate tempo</p>
+<div class="cell" data-execution_count="23">
+<div class="sourceCode cell-code" id="cb39" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb39-1">tempo, beats <span class="op" style="color: #5E5E5E;">=</span> librosa.beat.beat_track(onset_envelope<span class="op" style="color: #5E5E5E;">=</span>onset_envelope)</span>
+<span id="cb39-2">tempo, beats</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="23">
+<pre><code>(129.19921875,
+ array([   4,   23,   43,   63,   83,  102,  122,  142,  162,  181,  202,
+         222,  242,  261,  281,  301,  321,  341,  361,  382,  401,  421,
+         441,  461,  480,  500,  520,  540,  560,  579,  600,  620,  639,
+         658,  678,  698,  718,  737,  757,  777,  798,  817,  837,  857,
+         877,  896,  916,  936,  957,  976,  996, 1016, 1036, 1055, 1075,
+        1095, 1116, 1135, 1155, 1175, 1195, 1214, 1234, 1254, 1275, 1294,
+        1314, 1334, 1354, 1373, 1393, 1413, 1434, 1453, 1473, 1493, 1513,
+        1532, 1552, 1572, 1593, 1612, 1632, 1652, 1672, 1691, 1712, 1732,
+        1752, 1771, 1791, 1811, 1831, 1850, 1870, 1890, 1911, 1931, 1951,
+        1971, 1990, 2010, 2030, 2050, 2070, 2090, 2110, 2130, 2149, 2169,
+        2189, 2209, 2229, 2249, 2269, 2288, 2308, 2328, 2348, 2368, 2388,
+        2408, 2428, 2448, 2467, 2487, 2507, 2527, 2547]))</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="24">
+<div class="sourceCode cell-code" id="cb41" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb41-1">plt.plot(onset_envelope, label<span class="op" style="color: #5E5E5E;">=</span><span class="st" style="color: #20794D;">'Onset strength'</span>)</span>
+<span id="cb41-2">plt.vlines(onsets, <span class="dv" style="color: #AD0000;">0</span>, onset_envelope.<span class="bu" style="color: null;">max</span>(), color<span class="op" style="color: #5E5E5E;">=</span><span class="st" style="color: #20794D;">'r'</span>, alpha<span class="op" style="color: #5E5E5E;">=</span><span class="fl" style="color: #AD0000;">0.25</span>, label<span class="op" style="color: #5E5E5E;">=</span><span class="st" style="color: #20794D;">'onsets'</span>)</span>
+<span id="cb41-3">plt.xticks([]), plt.yticks([])</span>
+<span id="cb41-4">plt.legend(frameon<span class="op" style="color: #5E5E5E;">=</span><span class="va" style="color: #111111;">True</span>)</span>
+<span id="cb41-5">plt.axis(<span class="st" style="color: #20794D;">'tight'</span>)</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="24">
+<pre><code>(-132.3, 2778.3, -0.05, 1.05)</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="https://github.com/tyoc213/blog/posts/2020-09-26-Librosa-2015-presentation-updated-calls_files/figure-html/cell-25-output-2.png" class="img-fluid"></p>
+</div>
+</div>
+<p>beat events are in frame indices</p>
+<p>We can convert to time (in seconds), and sonify with mir_eval</p>
+<div class="cell" data-execution_count="25">
+<div class="sourceCode cell-code" id="cb43" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb43-1">beat_times <span class="op" style="color: #5E5E5E;">=</span> librosa.frames_to_time(beats)</span>
+<span id="cb43-2">beat_times</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="25">
+<pre><code>array([ 0.09287982,  0.53405896,  0.99845805,  1.46285714,  1.92725624,
+        2.36843537,  2.83283447,  3.29723356,  3.76163265,  4.20281179,
+        4.69043084,  5.15482993,  5.61922902,  6.06040816,  6.52480726,
+        6.98920635,  7.45360544,  7.91800454,  8.38240363,  8.87002268,
+        9.31120181,  9.77560091, 10.24      , 10.70439909, 11.14557823,
+       11.60997732, 12.07437642, 12.53877551, 13.0031746 , 13.44435374,
+       13.93197279, 14.39637188, 14.83755102, 15.27873016, 15.74312925,
+       16.20752834, 16.67192744, 17.11310658, 17.57750567, 18.04190476,
+       18.52952381, 18.97070295, 19.43510204, 19.89950113, 20.36390023,
+       20.80507937, 21.26947846, 21.73387755, 22.2214966 , 22.66267574,
+       23.12707483, 23.59147392, 24.05587302, 24.49705215, 24.96145125,
+       25.42585034, 25.91346939, 26.35464853, 26.81904762, 27.28344671,
+       27.7478458 , 28.18902494, 28.65342404, 29.11782313, 29.60544218,
+       30.04662132, 30.51102041, 30.9754195 , 31.43981859, 31.88099773,
+       32.34539683, 32.80979592, 33.29741497, 33.7385941 , 34.2029932 ,
+       34.66739229, 35.13179138, 35.57297052, 36.03736961, 36.50176871,
+       36.98938776, 37.43056689, 37.89496599, 38.35936508, 38.82376417,
+       39.26494331, 39.75256236, 40.21696145, 40.68136054, 41.12253968,
+       41.58693878, 42.05133787, 42.51573696, 42.9569161 , 43.42131519,
+       43.88571429, 44.37333333, 44.83773243, 45.30213152, 45.76653061,
+       46.20770975, 46.67210884, 47.13650794, 47.60090703, 48.06530612,
+       48.52970522, 48.99410431, 49.4585034 , 49.89968254, 50.36408163,
+       50.82848073, 51.29287982, 51.75727891, 52.221678  , 52.6860771 ,
+       53.12725624, 53.59165533, 54.05605442, 54.52045351, 54.98485261,
+       55.4492517 , 55.91365079, 56.37804989, 56.84244898, 57.28362812,
+       57.74802721, 58.2124263 , 58.6768254 , 59.14122449])</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb45" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb45-1">y_click <span class="op" style="color: #5E5E5E;">=</span> mir_eval.sonify.clicks(beat_times, sr, length<span class="op" style="color: #5E5E5E;">=</span><span class="bu" style="color: null;">len</span>(y))</span>
+<span id="cb45-2">Audio(data<span class="op" style="color: #5E5E5E;">=</span>y<span class="op" style="color: #5E5E5E;">+</span>y_click, rate<span class="op" style="color: #5E5E5E;">=</span>sr)</span></code></pre></div>
+</div>
+</section>
+<section id="temporal-structure" class="level3">
+<h3 class="anchored" data-anchor-id="temporal-structure">Temporal structure</h3>
+<div class="cell" data-execution_count="27">
+<div class="sourceCode cell-code" id="cb46" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb46-1">c_sync <span class="op" style="color: #5E5E5E;">=</span> librosa.util.sync(chroma, beats, aggregate<span class="op" style="color: #5E5E5E;">=</span>np.median)</span>
+<span id="cb46-2">c_sync.shape</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="27">
+<pre><code>(12, 130)</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="28">
+<div class="sourceCode cell-code" id="cb48" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb48-1">librosa.display.specshow(c_sync, y_axis<span class="op" style="color: #5E5E5E;">=</span><span class="st" style="color: #20794D;">'chroma'</span>)</span>
+<span id="cb48-2">plt.colorbar()</span></code></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>/home/tyoc213/miniconda3/envs/fastai/lib/python3.8/site-packages/librosa/display.py:822: UserWarning: Trying to display complex-valued input. Showing magnitude instead.
+  warnings.warn(</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="28">
+<pre><code>&lt;matplotlib.colorbar.Colorbar at 0x7fcb904d6100&gt;</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="https://github.com/tyoc213/blog/posts/2020-09-26-Librosa-2015-presentation-updated-calls_files/figure-html/cell-29-output-3.png" class="img-fluid"></p>
+</div>
+</div>
+</section>
+<section id="history-embedding-can-add-context" class="level3">
+<h3 class="anchored" data-anchor-id="history-embedding-can-add-context">history embedding can add context</h3>
+<div class="cell" data-execution_count="29">
+<div class="sourceCode cell-code" id="cb51" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb51-1">chroma_stack <span class="op" style="color: #5E5E5E;">=</span> librosa.feature.stack_memory(c_sync, n_steps<span class="op" style="color: #5E5E5E;">=</span><span class="dv" style="color: #AD0000;">3</span>, mode<span class="op" style="color: #5E5E5E;">=</span><span class="st" style="color: #20794D;">'edge'</span>)</span>
+<span id="cb51-2">chroma_stack.shape</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="29">
+<pre><code>(36, 130)</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="30">
+<div class="sourceCode cell-code" id="cb53" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb53-1">librosa.display.specshow(chroma_stack, y_axis<span class="op" style="color: #5E5E5E;">=</span><span class="st" style="color: #20794D;">'chroma'</span>)</span>
+<span id="cb53-2">plt.colorbar()</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="30">
+<pre><code>&lt;matplotlib.colorbar.Colorbar at 0x7fcb903be0d0&gt;</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="https://github.com/tyoc213/blog/posts/2020-09-26-Librosa-2015-presentation-updated-calls_files/figure-html/cell-31-output-2.png" class="img-fluid"></p>
+</div>
+</div>
+</section>
+<section id="recurrence-plots-show-nearest-neighbor-linkage-for-each-frame." class="level3">
+<h3 class="anchored" data-anchor-id="recurrence-plots-show-nearest-neighbor-linkage-for-each-frame.">recurrence plots show nearest neighbor linkage for each frame.</h3>
+<p>Chroma recurrence can encode harmonic repetitions</p>
+<div class="cell" data-execution_count="31">
+<div class="sourceCode cell-code" id="cb55" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb55-1"><span class="co" style="color: #5E5E5E;"># cant run this cell, it eats up 32 Gb physical memory + 37 Gb of swap on my Linux</span></span>
+<span id="cb55-2"><span class="co" style="color: #5E5E5E;"># R = librosa.segment.recurrence_matrix(y, sym=True)</span></span></code></pre></div>
+</div>
+<div class="cell" data-execution_count="32">
+<div class="sourceCode cell-code" id="cb56" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb56-1"><span class="co" style="color: #5E5E5E;">#R = librosa.segment.recurrence_matrix(y, sym=True)</span></span>
+<span id="cb56-2"><span class="co" style="color: #5E5E5E;">#R = librosa.segment.recurrence_matrix(chroma_stack, sym=True)</span></span>
+<span id="cb56-3"><span class="co" style="color: #5E5E5E;"># diagonal lines indicate repeated progressions</span></span>
+<span id="cb56-4"><span class="co" style="color: #5E5E5E;"># librosa.display.specshow(R, aspect='equal')</span></span>
+<span id="cb56-5"><span class="co" style="color: #5E5E5E;"># post processing R can reveal structural components, metrical structure, etc</span></span></code></pre></div>
+</div>
+<p>How to plot the different <code>R</code>s above?</p>
+
+
+</section>
+
+ ]]></description>
+  <guid>https://github.com/tyoc213/blog/posts/2020-09-26-librosa-2015-presentation-updated-calls.html</guid>
+  <pubDate>Sat, 26 Sep 2020 05:00:00 GMT</pubDate>
+</item>
+<item>
+  <title>Reconociendo dígitos en fastai2</title>
+  <link>https://github.com/tyoc213/blog/posts/2020-05-26-reconocer-dígitos.html</link>
+  <description><![CDATA[ 
+
+
+
+
+<section id="instalar-fastai2" class="level1">
+<h1>Instalar fastai2</h1>
+<p>http://dev.fast.ai/#Installing yo prefiero instalarlo como dice ahí en su propio entorno de conda.</p>
+<pre><code>git clone https://github.com/fastai/fastai2
+cd fastai2
+pip install -e ".[dev]"</code></pre>
+<p>para que CUDA este disponible <code>python -c 'import torch; print(torch.cuda.is_available())'</code> si no lo esta checa que este instalado con <code>nvidia-smi</code>, si esta instalado puede que no se haya instalado la versión correcta de pytorch y los drivers instalados ve como hacerlo en https://pytorch.org/get-started/locally/</p>
+<section id="registrandose-en-kaggle" class="level2">
+<h2 class="anchored" data-anchor-id="registrandose-en-kaggle">Registrandose en kaggle</h2>
+<ol type="1">
+<li>Registrarse como usuario en kaggle</li>
+<li>hacer <code>pip install kaggle</code></li>
+<li>Obtener tu clave privada de usuario y guardarla en la ruta default</li>
+<li>Entrar en https://www.kaggle.com/c/digit-recognizer y dar click en aceptar reglas para poder usar la aplicación de kaggle.</li>
+<li>Bajar los archivos con <code>kaggle competitions download -c digit-recognizer</code> y descomprimirlos en su propia carpeta</li>
+</ol>
+</section>
+<section id="importar-fastai2" class="level2">
+<h2 class="anchored" data-anchor-id="importar-fastai2">Importar fastai2</h2>
+<p>Importamos el modulo vision de fastai2</p>
+<div class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb2" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><span class="im" style="color: #00769E;">from</span> fastai2.vision.<span class="bu" style="color: null;">all</span> <span class="im" style="color: #00769E;">import</span> <span class="op" style="color: #5E5E5E;">*</span></span></code></pre></div>
+</div>
+<p>Vamos a definir algunas variables para poder ponerle nombre a nuestros archivos a enviar y guardar el nombre del modelo que usamos.</p>
+<div class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1">VERSION <span class="op" style="color: #5E5E5E;">=</span> <span class="dv" style="color: #AD0000;">4</span></span>
+<span id="cb3-2">MODELO<span class="op" style="color: #5E5E5E;">=</span>resnet34</span>
+<span id="cb3-3">NOMBRE_MODELO<span class="op" style="color: #5E5E5E;">=</span><span class="st" style="color: #20794D;">"resnet34"</span></span>
+<span id="cb3-4">BASE_FILE <span class="op" style="color: #5E5E5E;">=</span> <span class="ss" style="color: #20794D;">f"base-</span><span class="sc" style="color: #5E5E5E;">{</span>NOMBRE_MODELO<span class="sc" style="color: #5E5E5E;">}</span><span class="ss" style="color: #20794D;">_v</span><span class="sc" style="color: #5E5E5E;">{</span>VERSION<span class="sc" style="color: #5E5E5E;">}</span><span class="ss" style="color: #20794D;">"</span></span>
+<span id="cb3-5">SUBMIT_FILE <span class="op" style="color: #5E5E5E;">=</span> <span class="ss" style="color: #20794D;">f"submit-</span><span class="sc" style="color: #5E5E5E;">{</span>NOMBRE_MODELO<span class="sc" style="color: #5E5E5E;">}</span><span class="ss" style="color: #20794D;">_v</span><span class="sc" style="color: #5E5E5E;">{</span>VERSION<span class="sc" style="color: #5E5E5E;">}</span><span class="ss" style="color: #20794D;">"</span></span>
+<span id="cb3-6"></span>
+<span id="cb3-7">FINE_FILE <span class="op" style="color: #5E5E5E;">=</span> <span class="ss" style="color: #20794D;">f"base-</span><span class="sc" style="color: #5E5E5E;">{</span>NOMBRE_MODELO<span class="sc" style="color: #5E5E5E;">}</span><span class="ss" style="color: #20794D;">-fine_v</span><span class="sc" style="color: #5E5E5E;">{</span>VERSION<span class="sc" style="color: #5E5E5E;">}</span><span class="ss" style="color: #20794D;">"</span></span>
+<span id="cb3-8">SUBMIT_FINE_FILE <span class="op" style="color: #5E5E5E;">=</span> <span class="ss" style="color: #20794D;">f"submit-</span><span class="sc" style="color: #5E5E5E;">{</span>NOMBRE_MODELO<span class="sc" style="color: #5E5E5E;">}</span><span class="ss" style="color: #20794D;">-fine_v</span><span class="sc" style="color: #5E5E5E;">{</span>VERSION<span class="sc" style="color: #5E5E5E;">}</span><span class="ss" style="color: #20794D;">"</span></span></code></pre></div>
+</div>
+<p>Fastai2 trabaja muy bien con data loaders, estos necesitan que exista algun archivo en disco, lo cual puede ayudar para datasets grandes, pero tal vez no mucho a su lectura recurrente. Sólo necesitamos preprocesar esto la primer vez, por lo mismo usamos esos <code>if</code>s para extraerlos si es necesario desde cada row del <code>csv</code> hacia la imagen en disco.</p>
+<div class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb4" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><span class="im" style="color: #00769E;">import</span> string</span>
+<span id="cb4-2"><span class="co" style="color: #5E5E5E;"># in the same folder I have downloaded with: kaggle competitions download -c digit-recognizer</span></span>
+<span id="cb4-3">path <span class="op" style="color: #5E5E5E;">=</span> untar_data(<span class="st" style="color: #20794D;">"file://digit-recognizer.zip"</span>, dest<span class="op" style="color: #5E5E5E;">=</span><span class="st" style="color: #20794D;">"."</span>)</span>
+<span id="cb4-4"><span class="co" style="color: #5E5E5E;">#print(path)</span></span>
+<span id="cb4-5"><span class="co" style="color: #5E5E5E;">#print(path.ls())</span></span>
+<span id="cb4-6"></span>
+<span id="cb4-7"><span class="im" style="color: #00769E;">from</span> PIL <span class="im" style="color: #00769E;">import</span> Image</span>
+<span id="cb4-8"><span class="im" style="color: #00769E;">from</span> matplotlib <span class="im" style="color: #00769E;">import</span> cm</span>
+<span id="cb4-9"></span>
+<span id="cb4-10"><span class="im" style="color: #00769E;">import</span> pandas <span class="im" style="color: #00769E;">as</span> pd</span>
+<span id="cb4-11"></span>
+<span id="cb4-12">path <span class="op" style="color: #5E5E5E;">=</span> Path(<span class="st" style="color: #20794D;">"digit-recognizer"</span>)</span>
+<span id="cb4-13">df <span class="op" style="color: #5E5E5E;">=</span> pd.read_csv(path<span class="op" style="color: #5E5E5E;">/</span><span class="st" style="color: #20794D;">"train.csv"</span>, header<span class="op" style="color: #5E5E5E;">=</span><span class="st" style="color: #20794D;">'infer'</span>)</span>
+<span id="cb4-14">df.head()</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="3">
+
+<div>
+
+<table class="dataframe table table-sm table-striped">
+  <thead>
+    <tr>
+      <th></th>
+      <th>label</th>
+      <th>pixel0</th>
+      <th>pixel1</th>
+      <th>pixel2</th>
+      <th>pixel3</th>
+      <th>pixel4</th>
+      <th>pixel5</th>
+      <th>pixel6</th>
+      <th>pixel7</th>
+      <th>pixel8</th>
+      <th>...</th>
+      <th>pixel774</th>
+      <th>pixel775</th>
+      <th>pixel776</th>
+      <th>pixel777</th>
+      <th>pixel778</th>
+      <th>pixel779</th>
+      <th>pixel780</th>
+      <th>pixel781</th>
+      <th>pixel782</th>
+      <th>pixel783</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>4</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+  </tbody>
+</table>
+<p>5 rows × 785 columns</p>
+</div>
+</div>
+</div>
+<div class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb5" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><span class="op" style="color: #5E5E5E;">%%</span>time</span>
+<span id="cb5-2"><span class="kw" style="color: #003B4F;">def</span> get_image(csv_row):</span>
+<span id="cb5-3">    img <span class="op" style="color: #5E5E5E;">=</span> csv_row.reshape(<span class="dv" style="color: #AD0000;">28</span>,<span class="dv" style="color: #AD0000;">28</span>)</span>
+<span id="cb5-4">    x <span class="op" style="color: #5E5E5E;">=</span> cm.gist_earth(img)<span class="op" style="color: #5E5E5E;">*</span><span class="dv" style="color: #AD0000;">255</span></span>
+<span id="cb5-5">    <span class="cf" style="color: #003B4F;">return</span> Image.fromarray(np.uint8(x))</span>
+<span id="cb5-6"></span>
+<span id="cb5-7"><span class="kw" style="color: #003B4F;">def</span> explode_train():</span>
+<span id="cb5-8">    df <span class="op" style="color: #5E5E5E;">=</span> pd.read_csv(path<span class="op" style="color: #5E5E5E;">/</span><span class="st" style="color: #20794D;">'train.csv'</span>, header<span class="op" style="color: #5E5E5E;">=</span><span class="st" style="color: #20794D;">'infer'</span>)</span>
+<span id="cb5-9">    imagenes <span class="op" style="color: #5E5E5E;">=</span> df.iloc[:,<span class="dv" style="color: #AD0000;">1</span>:].<span class="bu" style="color: null;">apply</span>(<span class="kw" style="color: #003B4F;">lambda</span> x: x.values, axis<span class="op" style="color: #5E5E5E;">=</span><span class="dv" style="color: #AD0000;">1</span>).values</span>
+<span id="cb5-10">    labels <span class="op" style="color: #5E5E5E;">=</span> df.iloc[:,:<span class="dv" style="color: #AD0000;">1</span>].<span class="bu" style="color: null;">apply</span>(<span class="kw" style="color: #003B4F;">lambda</span> x: x.values[<span class="dv" style="color: #AD0000;">0</span>], axis<span class="op" style="color: #5E5E5E;">=</span><span class="dv" style="color: #AD0000;">1</span>)</span>
+<span id="cb5-11">    p <span class="op" style="color: #5E5E5E;">=</span> Path(path)<span class="op" style="color: #5E5E5E;">/</span><span class="st" style="color: #20794D;">'train'</span></span>
+<span id="cb5-12">    p.mkdir(parents<span class="op" style="color: #5E5E5E;">=</span><span class="va" style="color: #111111;">True</span>, exist_ok<span class="op" style="color: #5E5E5E;">=</span><span class="va" style="color: #111111;">True</span>)</span>
+<span id="cb5-13">        </span>
+<span id="cb5-14">    <span class="cf" style="color: #003B4F;">for</span> idx, l <span class="kw" style="color: #003B4F;">in</span> <span class="bu" style="color: null;">enumerate</span>(labels):</span>
+<span id="cb5-15">        im <span class="op" style="color: #5E5E5E;">=</span> get_image(imagenes[idx])</span>
+<span id="cb5-16">        image_name <span class="op" style="color: #5E5E5E;">=</span> (<span class="bu" style="color: null;">str</span>(l)<span class="op" style="color: #5E5E5E;">+</span><span class="st" style="color: #20794D;">"_"</span><span class="op" style="color: #5E5E5E;">+</span><span class="st" style="color: #20794D;">'train'</span><span class="op" style="color: #5E5E5E;">+</span><span class="st" style="color: #20794D;">'_'</span><span class="op" style="color: #5E5E5E;">+</span><span class="st" style="color: #20794D;">''</span>.join(random.choice(string.ascii_lowercase) <span class="cf" style="color: #003B4F;">for</span> i <span class="kw" style="color: #003B4F;">in</span> <span class="bu" style="color: null;">range</span>(<span class="dv" style="color: #AD0000;">8</span>))) <span class="op" style="color: #5E5E5E;">+</span> <span class="st" style="color: #20794D;">".png"</span></span>
+<span id="cb5-17">        im.save(p<span class="op" style="color: #5E5E5E;">/</span>image_name)</span>
+<span id="cb5-18"></span>
+<span id="cb5-19"><span class="kw" style="color: #003B4F;">def</span> explode_test():</span>
+<span id="cb5-20">    df <span class="op" style="color: #5E5E5E;">=</span> pd.read_csv(path<span class="op" style="color: #5E5E5E;">/</span><span class="st" style="color: #20794D;">'test.csv'</span>, header<span class="op" style="color: #5E5E5E;">=</span><span class="st" style="color: #20794D;">'infer'</span>)</span>
+<span id="cb5-21">    imagenes <span class="op" style="color: #5E5E5E;">=</span> df.iloc[:,:].<span class="bu" style="color: null;">apply</span>(<span class="kw" style="color: #003B4F;">lambda</span> x: x.values, axis<span class="op" style="color: #5E5E5E;">=</span><span class="dv" style="color: #AD0000;">1</span>).values</span>
+<span id="cb5-22">    p <span class="op" style="color: #5E5E5E;">=</span> Path(path)<span class="op" style="color: #5E5E5E;">/</span><span class="st" style="color: #20794D;">'test'</span></span>
+<span id="cb5-23">    p.mkdir(parents<span class="op" style="color: #5E5E5E;">=</span><span class="va" style="color: #111111;">True</span>, exist_ok<span class="op" style="color: #5E5E5E;">=</span><span class="va" style="color: #111111;">True</span>)</span>
+<span id="cb5-24">    <span class="cf" style="color: #003B4F;">for</span> idx, l <span class="kw" style="color: #003B4F;">in</span> <span class="bu" style="color: null;">enumerate</span>(imagenes):</span>
+<span id="cb5-25">        im <span class="op" style="color: #5E5E5E;">=</span> get_image(imagenes[idx])</span>
+<span id="cb5-26">        im.save(p <span class="op" style="color: #5E5E5E;">/</span> <span class="ss" style="color: #20794D;">f"</span><span class="sc" style="color: #5E5E5E;">{</span>idx<span class="sc" style="color: #5E5E5E;">}</span><span class="ss" style="color: #20794D;">.png"</span>)</span>
+<span id="cb5-27"><span class="cf" style="color: #003B4F;">if</span> <span class="kw" style="color: #003B4F;">not</span> (path<span class="op" style="color: #5E5E5E;">/</span><span class="st" style="color: #20794D;">'train'</span>).exists():</span>
+<span id="cb5-28">    explode_train()</span>
+<span id="cb5-29"><span class="cf" style="color: #003B4F;">if</span> <span class="kw" style="color: #003B4F;">not</span> (path<span class="op" style="color: #5E5E5E;">/</span><span class="st" style="color: #20794D;">'test'</span>).exists():</span>
+<span id="cb5-30">    explode_test()</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>CPU times: user 106 µs, sys: 13 µs, total: 119 µs
+Wall time: 81.1 µs</code></pre>
+</div>
+</div>
+<p>Para leer todas las imagenes generadas, lo haciemos por medio de un <code>DataBlock</code> el cual es un <code>blueprint</code> de donde, como y que vamos a hacer con esas imagenes para obtener finalmente las imagenes en <code>batches</code> o grupos de imagenes (de 64 en 64 por default) y la carga de las imagenes como tal se hace por medio de <code>data_loader = data_block.dataloaders(path)</code> el cual en este caso también aprende el “vocabulario” a aprender ya que se ha especificado que el segundo bloque es un bloque de categorias a diferencia del primero que es de Imagenes.</p>
+<p><code>get_my_labels</code> obtiene a partir de el archivo de imagen leído el nombre y regresa el dígito al que pertenece del vocabulario.</p>
+<div class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb7" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><span class="op" style="color: #5E5E5E;">%%</span>time</span>
+<span id="cb7-2"><span class="kw" style="color: #003B4F;">def</span> get_my_labels(fname):</span>
+<span id="cb7-3">    <span class="cf" style="color: #003B4F;">return</span> <span class="bu" style="color: null;">int</span>(fname.name[<span class="dv" style="color: #AD0000;">0</span>])</span>
+<span id="cb7-4"></span>
+<span id="cb7-5">dblock <span class="op" style="color: #5E5E5E;">=</span> DataBlock(</span>
+<span id="cb7-6">    splitter  <span class="op" style="color: #5E5E5E;">=</span> RandomSplitter(),</span>
+<span id="cb7-7">    item_tfms <span class="op" style="color: #5E5E5E;">=</span> Resize(<span class="dv" style="color: #AD0000;">224</span>),</span>
+<span id="cb7-8">    blocks    <span class="op" style="color: #5E5E5E;">=</span> (ImageBlock, CategoryBlock),</span>
+<span id="cb7-9">    get_items <span class="op" style="color: #5E5E5E;">=</span> get_image_files,</span>
+<span id="cb7-10">    get_y     <span class="op" style="color: #5E5E5E;">=</span> get_my_labels</span>
+<span id="cb7-11">    )</span>
+<span id="cb7-12"></span>
+<span id="cb7-13">dls <span class="op" style="color: #5E5E5E;">=</span> dblock.dataloaders(<span class="st" style="color: #20794D;">"digit-recognizer/train"</span>)</span>
+<span id="cb7-14">dls.vocab</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>CPU times: user 4.12 s, sys: 549 ms, total: 4.67 s
+Wall time: 4.81 s</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="5">
+<pre><code>(#10) [0,1,2,3,4,5,6,7,8,9]</code></pre>
+</div>
+</div>
+</section>
+<section id="show-batch" class="level2">
+<h2 class="anchored" data-anchor-id="show-batch">show batch</h2>
+<p>Podemos ver que realmente este encontrando las imagenes mostrando un batch de imagenes.</p>
+<div class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb10" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1">dls.show_batch()</span></code></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="https://github.com/tyoc213/blog/posts/2020-05-26-Reconocer-dígitos_files/figure-html/cell-7-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+</section>
+<section id="cargar-un-modelo-y-entrenarlo" class="level2">
+<h2 class="anchored" data-anchor-id="cargar-un-modelo-y-entrenarlo">Cargar un modelo y entrenarlo</h2>
+<p>En fastai2 podemos cargar un modelo ya entrenado y reusarlo para ajustarlo a la tarea que queremos llevar a cabo.</p>
+<div class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb11" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1">learn <span class="op" style="color: #5E5E5E;">=</span> cnn_learner(dls, MODELO, metrics<span class="op" style="color: #5E5E5E;">=</span>error_rate)</span></code></pre></div>
+</div>
+<p>Nuestro modelo en este momento ya tiene una estructura la cual se puede sumarizar así</p>
+<div class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb12" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1">learn.summary()</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="8">
+<pre><code>Sequential (Input shape: ['64 x 3 x 224 x 224'])
+================================================================
+Layer (type)         Output Shape         Param #    Trainable 
+================================================================
+Conv2d               64 x 64 x 112 x 112  9,408      False     
+________________________________________________________________
+BatchNorm2d          64 x 64 x 112 x 112  128        True      
+________________________________________________________________
+ReLU                 64 x 64 x 112 x 112  0          False     
+________________________________________________________________
+MaxPool2d            64 x 64 x 56 x 56    0          False     
+________________________________________________________________
+Conv2d               64 x 64 x 56 x 56    36,864     False     
+________________________________________________________________
+BatchNorm2d          64 x 64 x 56 x 56    128        True      
+________________________________________________________________
+ReLU                 64 x 64 x 56 x 56    0          False     
+________________________________________________________________
+Conv2d               64 x 64 x 56 x 56    36,864     False     
+________________________________________________________________
+BatchNorm2d          64 x 64 x 56 x 56    128        True      
+________________________________________________________________
+Conv2d               64 x 64 x 56 x 56    36,864     False     
+________________________________________________________________
+BatchNorm2d          64 x 64 x 56 x 56    128        True      
+________________________________________________________________
+ReLU                 64 x 64 x 56 x 56    0          False     
+________________________________________________________________
+Conv2d               64 x 64 x 56 x 56    36,864     False     
+________________________________________________________________
+BatchNorm2d          64 x 64 x 56 x 56    128        True      
+________________________________________________________________
+Conv2d               64 x 64 x 56 x 56    36,864     False     
+________________________________________________________________
+BatchNorm2d          64 x 64 x 56 x 56    128        True      
+________________________________________________________________
+ReLU                 64 x 64 x 56 x 56    0          False     
+________________________________________________________________
+Conv2d               64 x 64 x 56 x 56    36,864     False     
+________________________________________________________________
+BatchNorm2d          64 x 64 x 56 x 56    128        True      
+________________________________________________________________
+Conv2d               64 x 128 x 28 x 28   73,728     False     
+________________________________________________________________
+BatchNorm2d          64 x 128 x 28 x 28   256        True      
+________________________________________________________________
+ReLU                 64 x 128 x 28 x 28   0          False     
+________________________________________________________________
+Conv2d               64 x 128 x 28 x 28   147,456    False     
+________________________________________________________________
+BatchNorm2d          64 x 128 x 28 x 28   256        True      
+________________________________________________________________
+Conv2d               64 x 128 x 28 x 28   8,192      False     
+________________________________________________________________
+BatchNorm2d          64 x 128 x 28 x 28   256        True      
+________________________________________________________________
+Conv2d               64 x 128 x 28 x 28   147,456    False     
+________________________________________________________________
+BatchNorm2d          64 x 128 x 28 x 28   256        True      
+________________________________________________________________
+ReLU                 64 x 128 x 28 x 28   0          False     
+________________________________________________________________
+Conv2d               64 x 128 x 28 x 28   147,456    False     
+________________________________________________________________
+BatchNorm2d          64 x 128 x 28 x 28   256        True      
+________________________________________________________________
+Conv2d               64 x 128 x 28 x 28   147,456    False     
+________________________________________________________________
+BatchNorm2d          64 x 128 x 28 x 28   256        True      
+________________________________________________________________
+ReLU                 64 x 128 x 28 x 28   0          False     
+________________________________________________________________
+Conv2d               64 x 128 x 28 x 28   147,456    False     
+________________________________________________________________
+BatchNorm2d          64 x 128 x 28 x 28   256        True      
+________________________________________________________________
+Conv2d               64 x 128 x 28 x 28   147,456    False     
+________________________________________________________________
+BatchNorm2d          64 x 128 x 28 x 28   256        True      
+________________________________________________________________
+ReLU                 64 x 128 x 28 x 28   0          False     
+________________________________________________________________
+Conv2d               64 x 128 x 28 x 28   147,456    False     
+________________________________________________________________
+BatchNorm2d          64 x 128 x 28 x 28   256        True      
+________________________________________________________________
+Conv2d               64 x 256 x 14 x 14   294,912    False     
+________________________________________________________________
+BatchNorm2d          64 x 256 x 14 x 14   512        True      
+________________________________________________________________
+ReLU                 64 x 256 x 14 x 14   0          False     
+________________________________________________________________
+Conv2d               64 x 256 x 14 x 14   589,824    False     
+________________________________________________________________
+BatchNorm2d          64 x 256 x 14 x 14   512        True      
+________________________________________________________________
+Conv2d               64 x 256 x 14 x 14   32,768     False     
+________________________________________________________________
+BatchNorm2d          64 x 256 x 14 x 14   512        True      
+________________________________________________________________
+Conv2d               64 x 256 x 14 x 14   589,824    False     
+________________________________________________________________
+BatchNorm2d          64 x 256 x 14 x 14   512        True      
+________________________________________________________________
+ReLU                 64 x 256 x 14 x 14   0          False     
+________________________________________________________________
+Conv2d               64 x 256 x 14 x 14   589,824    False     
+________________________________________________________________
+BatchNorm2d          64 x 256 x 14 x 14   512        True      
+________________________________________________________________
+Conv2d               64 x 256 x 14 x 14   589,824    False     
+________________________________________________________________
+BatchNorm2d          64 x 256 x 14 x 14   512        True      
+________________________________________________________________
+ReLU                 64 x 256 x 14 x 14   0          False     
+________________________________________________________________
+Conv2d               64 x 256 x 14 x 14   589,824    False     
+________________________________________________________________
+BatchNorm2d          64 x 256 x 14 x 14   512        True      
+________________________________________________________________
+Conv2d               64 x 256 x 14 x 14   589,824    False     
+________________________________________________________________
+BatchNorm2d          64 x 256 x 14 x 14   512        True      
+________________________________________________________________
+ReLU                 64 x 256 x 14 x 14   0          False     
+________________________________________________________________
+Conv2d               64 x 256 x 14 x 14   589,824    False     
+________________________________________________________________
+BatchNorm2d          64 x 256 x 14 x 14   512        True      
+________________________________________________________________
+Conv2d               64 x 256 x 14 x 14   589,824    False     
+________________________________________________________________
+BatchNorm2d          64 x 256 x 14 x 14   512        True      
+________________________________________________________________
+ReLU                 64 x 256 x 14 x 14   0          False     
+________________________________________________________________
+Conv2d               64 x 256 x 14 x 14   589,824    False     
+________________________________________________________________
+BatchNorm2d          64 x 256 x 14 x 14   512        True      
+________________________________________________________________
+Conv2d               64 x 256 x 14 x 14   589,824    False     
+________________________________________________________________
+BatchNorm2d          64 x 256 x 14 x 14   512        True      
+________________________________________________________________
+ReLU                 64 x 256 x 14 x 14   0          False     
+________________________________________________________________
+Conv2d               64 x 256 x 14 x 14   589,824    False     
+________________________________________________________________
+BatchNorm2d          64 x 256 x 14 x 14   512        True      
+________________________________________________________________
+Conv2d               64 x 512 x 7 x 7     1,179,648  False     
+________________________________________________________________
+BatchNorm2d          64 x 512 x 7 x 7     1,024      True      
+________________________________________________________________
+ReLU                 64 x 512 x 7 x 7     0          False     
+________________________________________________________________
+Conv2d               64 x 512 x 7 x 7     2,359,296  False     
+________________________________________________________________
+BatchNorm2d          64 x 512 x 7 x 7     1,024      True      
+________________________________________________________________
+Conv2d               64 x 512 x 7 x 7     131,072    False     
+________________________________________________________________
+BatchNorm2d          64 x 512 x 7 x 7     1,024      True      
+________________________________________________________________
+Conv2d               64 x 512 x 7 x 7     2,359,296  False     
+________________________________________________________________
+BatchNorm2d          64 x 512 x 7 x 7     1,024      True      
+________________________________________________________________
+ReLU                 64 x 512 x 7 x 7     0          False     
+________________________________________________________________
+Conv2d               64 x 512 x 7 x 7     2,359,296  False     
+________________________________________________________________
+BatchNorm2d          64 x 512 x 7 x 7     1,024      True      
+________________________________________________________________
+Conv2d               64 x 512 x 7 x 7     2,359,296  False     
+________________________________________________________________
+BatchNorm2d          64 x 512 x 7 x 7     1,024      True      
+________________________________________________________________
+ReLU                 64 x 512 x 7 x 7     0          False     
+________________________________________________________________
+Conv2d               64 x 512 x 7 x 7     2,359,296  False     
+________________________________________________________________
+BatchNorm2d          64 x 512 x 7 x 7     1,024      True      
+________________________________________________________________
+AdaptiveAvgPool2d    64 x 512 x 1 x 1     0          False     
+________________________________________________________________
+AdaptiveMaxPool2d    64 x 512 x 1 x 1     0          False     
+________________________________________________________________
+Flatten              64 x 1024            0          False     
+________________________________________________________________
+BatchNorm1d          64 x 1024            2,048      True      
+________________________________________________________________
+Dropout              64 x 1024            0          False     
+________________________________________________________________
+Linear               64 x 512             524,288    True      
+________________________________________________________________
+ReLU                 64 x 512             0          False     
+________________________________________________________________
+BatchNorm1d          64 x 512             1,024      True      
+________________________________________________________________
+Dropout              64 x 512             0          False     
+________________________________________________________________
+Linear               64 x 10              5,120      True      
+________________________________________________________________
+
+Total params: 21,817,152
+Total trainable params: 549,504
+Total non-trainable params: 21,267,648
+
+Optimizer used: &lt;function Adam at 0x7fb52353ab00&gt;
+Loss function: FlattenedLoss of CrossEntropyLoss()
+
+Model frozen up to parameter group number 2
+
+Callbacks:
+  - TrainEvalCallback
+  - Recorder
+  - ProgressCallback</code></pre>
+</div>
+</div>
+<p>Podemos ver las predicciones actuales antes de reajustar los parametros de la red. En rojo se muestran los errores en verde los que estan bien. Los aciertos más bien son aleatorios.</p>
+<p>Los resultados como se espera no pueden reconocer los patrones ya que esta inicializada para otro tipo de tarea.</p>
+<div class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb14" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1">learn.show_results()</span></code></pre></div>
+<div class="cell-output cell-output-display">
+
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="https://github.com/tyoc213/blog/posts/2020-05-26-Reconocer-dígitos_files/figure-html/cell-10-output-2.png" class="img-fluid"></p>
+</div>
+</div>
+</section>
+<section id="ahora-podemos-entrenarlo-con-fine_tune" class="level2">
+<h2 class="anchored" data-anchor-id="ahora-podemos-entrenarlo-con-fine_tune">Ahora podemos entrenarlo con fine_tune</h2>
+<p>El método fit sirve para ejecutar una serie de pasadas sobre los datos de entrenamiento.</p>
+<div class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb15" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><span class="op" style="color: #5E5E5E;">%%</span>time</span>
+<span id="cb15-2">learn.fine_tune(<span class="dv" style="color: #AD0000;">1</span>)</span></code></pre></div>
+<div class="cell-output cell-output-display">
+
+<table class="dataframe table table-sm table-striped">
+  <thead>
+    <tr>
+      <th>epoch</th>
+      <th>train_loss</th>
+      <th>valid_loss</th>
+      <th>error_rate</th>
+      <th>time</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>0.227946</td>
+      <td>0.135213</td>
+      <td>0.040000</td>
+      <td>01:16</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+<div class="cell-output cell-output-display">
+
+<table class="dataframe table table-sm table-striped">
+  <thead>
+    <tr>
+      <th>epoch</th>
+      <th>train_loss</th>
+      <th>valid_loss</th>
+      <th>error_rate</th>
+      <th>time</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>0.035625</td>
+      <td>0.025032</td>
+      <td>0.007024</td>
+      <td>01:43</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>CPU times: user 2min 15s, sys: 26.2 s, total: 2min 42s
+Wall time: 3min</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb17" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1">learn.show_results()</span></code></pre></div>
+<div class="cell-output cell-output-display">
+
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="https://github.com/tyoc213/blog/posts/2020-05-26-Reconocer-dígitos_files/figure-html/cell-12-output-2.png" class="img-fluid"></p>
+</div>
+</div>
+<p>Nuestro modelo en este momento ya puede asertar con más confianza el dígito que se le esta pasando</p>
+<div class="cell" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb18" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1">learn.predict(Path(<span class="st" style="color: #20794D;">"digit-recognizer"</span>)<span class="op" style="color: #5E5E5E;">/</span><span class="st" style="color: #20794D;">'test'</span><span class="op" style="color: #5E5E5E;">/</span><span class="st" style="color: #20794D;">"1111.png"</span>)</span></code></pre></div>
+<div class="cell-output cell-output-display">
+
+</div>
+<div class="cell-output cell-output-display" data-execution_count="12">
+<pre><code>('2',
+ tensor(2),
+ tensor([8.4126e-10, 8.9289e-08, 1.0000e+00, 7.2959e-07, 2.4069e-09, 2.0494e-08,
+         2.9449e-09, 1.0405e-07, 2.0946e-07, 1.2205e-10]))</code></pre>
+</div>
+</div>
+<p>Si volvemos a checar los resultados podemos ver que ciertamente ya puede reconocer los patrones.</p>
+<p>Veamos cuales son las imagenes que más costaron reconocer.</p>
+<div class="cell" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb20" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1">interp <span class="op" style="color: #5E5E5E;">=</span> Interpretation.from_learner(learn)</span>
+<span id="cb20-2">interp.plot_top_losses(<span class="dv" style="color: #AD0000;">9</span>, figsize<span class="op" style="color: #5E5E5E;">=</span>(<span class="dv" style="color: #AD0000;">15</span>,<span class="dv" style="color: #AD0000;">10</span>))</span></code></pre></div>
+<div class="cell-output cell-output-display">
+
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="https://github.com/tyoc213/blog/posts/2020-05-26-Reconocer-dígitos_files/figure-html/cell-14-output-2.png" class="img-fluid"></p>
+</div>
+</div>
+<p>Para guardar los resultados obtenidos y mandarlos a kaggle, basta con hacer lo siguiente</p>
+<div class="cell" data-execution_count="14">
+<div class="sourceCode cell-code" id="cb21" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><span class="kw" style="color: #003B4F;">def</span> predict_test(the_learner, file_name):</span>
+<span id="cb21-2">    p <span class="op" style="color: #5E5E5E;">=</span> path<span class="op" style="color: #5E5E5E;">/</span><span class="st" style="color: #20794D;">'test'</span></span>
+<span id="cb21-3">    <span class="bu" style="color: null;">print</span>(<span class="ss" style="color: #20794D;">f"predicting </span><span class="sc" style="color: #5E5E5E;">{</span><span class="bu" style="color: null;">len</span>(p.ls())<span class="sc" style="color: #5E5E5E;">}</span><span class="ss" style="color: #20794D;"> in </span><span class="sc" style="color: #5E5E5E;">{</span>p<span class="sc" style="color: #5E5E5E;">}</span><span class="ss" style="color: #20794D;">"</span>)</span>
+<span id="cb21-4">    l <span class="op" style="color: #5E5E5E;">=</span> []</span>
+<span id="cb21-5">    <span class="cf" style="color: #003B4F;">for</span> idx, img <span class="kw" style="color: #003B4F;">in</span> <span class="bu" style="color: null;">enumerate</span>(p.ls()):</span>
+<span id="cb21-6">        fname <span class="op" style="color: #5E5E5E;">=</span> p<span class="op" style="color: #5E5E5E;">/</span><span class="ss" style="color: #20794D;">f"</span><span class="sc" style="color: #5E5E5E;">{</span>idx<span class="sc" style="color: #5E5E5E;">}</span><span class="ss" style="color: #20794D;">.png"</span></span>
+<span id="cb21-7">        pred <span class="op" style="color: #5E5E5E;">=</span> the_learner.predict(fname)</span>
+<span id="cb21-8">        <span class="co" style="color: #5E5E5E;"># la predicción contiene todo el resultado, la predicción esta en el elemento 0</span></span>
+<span id="cb21-9">        l.append( [idx<span class="op" style="color: #5E5E5E;">+</span><span class="dv" style="color: #AD0000;">1</span>, <span class="bu" style="color: null;">int</span>(pred[<span class="dv" style="color: #AD0000;">0</span>])] )</span>
+<span id="cb21-10">        <span class="cf" style="color: #003B4F;">if</span> idx <span class="op" style="color: #5E5E5E;">%</span> <span class="dv" style="color: #AD0000;">2800</span> <span class="op" style="color: #5E5E5E;">==</span> <span class="dv" style="color: #AD0000;">0</span>:</span>
+<span id="cb21-11">            <span class="bu" style="color: null;">print</span>(<span class="ss" style="color: #20794D;">f"</span><span class="sc" style="color: #5E5E5E;">{</span>[idx, pred[<span class="dv" style="color: #AD0000;">0</span>]]<span class="sc" style="color: #5E5E5E;">}</span><span class="ss" style="color: #20794D;">..."</span>)</span>
+<span id="cb21-12">    df <span class="op" style="color: #5E5E5E;">=</span> pd.DataFrame(l)</span>
+<span id="cb21-13">    h <span class="op" style="color: #5E5E5E;">=</span> [<span class="st" style="color: #20794D;">"ImageId"</span>,<span class="st" style="color: #20794D;">"label"</span>]</span>
+<span id="cb21-14">    df.to_csv(<span class="ss" style="color: #20794D;">f"</span><span class="sc" style="color: #5E5E5E;">{</span>file_name<span class="sc" style="color: #5E5E5E;">}</span><span class="ss" style="color: #20794D;">.csv"</span>, header<span class="op" style="color: #5E5E5E;">=</span>h, index<span class="op" style="color: #5E5E5E;">=</span><span class="va" style="color: #111111;">False</span>) <span class="cf" style="color: #003B4F;">if</span> <span class="va" style="color: #111111;">True</span> <span class="cf" style="color: #003B4F;">else</span> <span class="bu" style="color: null;">print</span>(<span class="st" style="color: #20794D;">"** skipped save **"</span>)</span>
+<span id="cb21-15">    <span class="bu" style="color: null;">print</span>(<span class="st" style="color: #20794D;">"done!"</span>)</span></code></pre></div>
+</div>
+<p>Removemos el callback del loader</p>
+<div class="cell" data-execution_count="15">
+<div class="sourceCode cell-code" id="cb22" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><span class="op" style="color: #5E5E5E;">%%</span>time</span>
+<span id="cb22-2">learn.remove_cb(learn.cbs[<span class="dv" style="color: #AD0000;">2</span>])</span>
+<span id="cb22-3">predict_test(learn, BASE_FILE)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>predicting 28000 in digit-recognizer/test
+[0, '2']...
+[2800, '4']...
+[5600, '8']...
+[8400, '5']...
+[11200, '4']...
+[14000, '3']...
+[16800, '1']...
+[19600, '5']...
+[22400, '9']...
+[25200, '3']...
+done!
+CPU times: user 53min 39s, sys: 1h 36min 21s, total: 2h 30min
+Wall time: 2h 49min 33s</code></pre>
+</div>
+</div>
+<p>El <code>Learner</code> que actualmente se encuentra en <code>learn</code> es muy bueno para quedar cerca de los primeros mil competidores, lo que tenemos que hacer ahora es mejorarlo poco a poco.</p>
+<p>Pero antes de esto vamos a salvarlo de 2 formas:</p>
+<ul>
+<li>exportandolo el cual requiere que despues se vuelva a cargar y crear otro cnn</li>
+<li>salvar y cargar de manera directa</li>
+</ul>
+<p>Guardamos el modelo actual para poder cargarlo despues via <code>load</code>.</p>
+<div class="cell" data-execution_count="17">
+<div class="sourceCode cell-code" id="cb24" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1">learn.save(BASE_FILE) <span class="cf" style="color: #003B4F;">if</span> <span class="va" style="color: #111111;">True</span> <span class="cf" style="color: #003B4F;">else</span> <span class="bu" style="color: null;">print</span>(<span class="st" style="color: #20794D;">"No se a guardado el archivo"</span>)</span></code></pre></div>
+</div>
+</section>
+<section id="fine-tunning" class="level2">
+<h2 class="anchored" data-anchor-id="fine-tunning">Fine tunning</h2>
+<p>Ahora se puede cargar desde donde se quedo el paso guardado por save anterior, pero debe de contener datos a los cuales referirse, por eso se carga a travez de un modelo instanciado igual que antes, sólo que este ya esta “entrenado” a la tarea actual.</p>
+<div class="cell" data-execution_count="18">
+<div class="sourceCode cell-code" id="cb25" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1">l2 <span class="op" style="color: #5E5E5E;">=</span> cnn_learner(dls, MODELO, metrics<span class="op" style="color: #5E5E5E;">=</span>error_rate)</span></code></pre></div>
+</div>
+<p>Una vez instanciado igual que el modelo que guardamos, se puede cargar el mismo desde el archivo que se guardo con <code>learn.save</code></p>
+<div class="cell" data-execution_count="19">
+<div class="sourceCode cell-code" id="cb26" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1">l2.load(BASE_FILE)</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="19">
+<pre><code>&lt;fastai2.learner.Learner at 0x7fb5202f10d0&gt;</code></pre>
+</div>
+</div>
+<p>Buscamos un buen learning rate</p>
+<div class="cell" data-execution_count="20">
+<div class="sourceCode cell-code" id="cb28" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1">l2.lr_find()</span></code></pre></div>
+<div class="cell-output cell-output-display">
+
+</div>
+<div class="cell-output cell-output-display" data-execution_count="20">
+<pre><code>SuggestedLRs(lr_min=0.00043651582673192023, lr_steep=6.309573450380412e-07)</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="https://github.com/tyoc213/blog/posts/2020-05-26-Reconocer-dígitos_files/figure-html/cell-20-output-3.png" class="img-fluid"></p>
+</div>
+</div>
+<p>Descongelamos el modelo entrenado para que se pueda entrenar nuevamente y usamos el <code>learning rate</code> que encontramos anteriormente</p>
+<div class="cell" data-execution_count="21">
+<div class="sourceCode cell-code" id="cb30" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><span class="op" style="color: #5E5E5E;">%%</span>time</span>
+<span id="cb30-2">l2.unfreeze()</span>
+<span id="cb30-3">l2.fine_tune(<span class="dv" style="color: #AD0000;">8</span>, <span class="fl" style="color: #AD0000;">1e-2</span>) </span></code></pre></div>
+<div class="cell-output cell-output-display">
+
+<table class="dataframe table table-sm table-striped">
+  <thead>
+    <tr>
+      <th>epoch</th>
+      <th>train_loss</th>
+      <th>valid_loss</th>
+      <th>error_rate</th>
+      <th>time</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>0.080212</td>
+      <td>0.057889</td>
+      <td>0.010238</td>
+      <td>01:10</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+<div class="cell-output cell-output-display">
+
+<table class="dataframe table table-sm table-striped">
+  <thead>
+    <tr>
+      <th>epoch</th>
+      <th>train_loss</th>
+      <th>valid_loss</th>
+      <th>error_rate</th>
+      <th>time</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>0.074369</td>
+      <td>0.067521</td>
+      <td>0.013690</td>
+      <td>01:36</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>0.082539</td>
+      <td>0.081573</td>
+      <td>0.018690</td>
+      <td>01:36</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>0.058147</td>
+      <td>0.052700</td>
+      <td>0.015238</td>
+      <td>01:35</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>0.042055</td>
+      <td>0.044290</td>
+      <td>0.009048</td>
+      <td>01:34</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>0.029418</td>
+      <td>0.040308</td>
+      <td>0.009048</td>
+      <td>01:33</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td>0.008509</td>
+      <td>0.022320</td>
+      <td>0.004286</td>
+      <td>01:34</td>
+    </tr>
+    <tr>
+      <td>6</td>
+      <td>0.003744</td>
+      <td>0.021935</td>
+      <td>0.004286</td>
+      <td>01:36</td>
+    </tr>
+    <tr>
+      <td>7</td>
+      <td>0.000918</td>
+      <td>0.023328</td>
+      <td>0.004524</td>
+      <td>01:35</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>CPU times: user 10min 46s, sys: 2min 52s, total: 13min 38s
+Wall time: 13min 53s</code></pre>
+</div>
+</div>
+<p>Guardamos el nuevo modelo ajustado</p>
+<div class="cell" data-execution_count="22">
+<div class="sourceCode cell-code" id="cb32" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1">l2.save(FINE_FILE)</span></code></pre></div>
+</div>
+<p>Y lo usamos para predecir eliminando también el callback del progress bar</p>
+<div class="cell" data-execution_count="23">
+<div class="sourceCode cell-code" id="cb33" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1">l2.cbs, l2.cbs[<span class="dv" style="color: #AD0000;">2</span>]</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="23">
+<pre><code>((#3) [TrainEvalCallback,Recorder,ProgressCallback], ProgressCallback)</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="24">
+<div class="sourceCode cell-code" id="cb35" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1"><span class="op" style="color: #5E5E5E;">%%</span>time</span>
+<span id="cb35-2">l2.remove_cb(l2.cbs[<span class="dv" style="color: #AD0000;">2</span>])</span>
+<span id="cb35-3">predict_test(l2, FINE_FILE)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>predicting 28000 in digit-recognizer/test
+[0, '2']...
+[2800, '4']...
+[5600, '8']...
+[8400, '5']...
+[11200, '4']...
+[14000, '3']...
+[16800, '1']...
+[19600, '5']...
+[22400, '9']...
+[25200, '3']...
+done!
+CPU times: user 39min 42s, sys: 1h 35min 30s, total: 2h 15min 13s
+Wall time: 2h 36min 45s</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="25">
+<div class="sourceCode cell-code" id="cb37" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1">l2.validate()</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="25">
+<pre><code>(#2) [0.023327725008130074,0.0045238095335662365]</code></pre>
+</div>
+</div>
+</section>
+<section id="exportar-a-producción" class="level2">
+<h2 class="anchored" data-anchor-id="exportar-a-producción">Exportar a producción</h2>
+<p>Si no queremos seguir reentrenando nuestro trabajo, podemos sólo exportar el modelo para que se use en predicciones al cargarlo.</p>
+<div class="cell" data-execution_count="26">
+<div class="sourceCode cell-code" id="cb39" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb39-1">learn.export(BASE_FILE) <span class="cf" style="color: #003B4F;">if</span> <span class="va" style="color: #111111;">False</span> <span class="cf" style="color: #003B4F;">else</span> <span class="bu" style="color: null;">print</span>(<span class="st" style="color: #20794D;">"no se ha exportado"</span>)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>no se ha exportado</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="27">
+<div class="sourceCode cell-code" id="cb41" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb41-1">l2.export(FINE_FILE) <span class="cf" style="color: #003B4F;">if</span> <span class="va" style="color: #111111;">False</span> <span class="cf" style="color: #003B4F;">else</span> <span class="bu" style="color: null;">print</span>(<span class="st" style="color: #20794D;">"no se ha exportado nada"</span>)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>no se ha exportado nada</code></pre>
+</div>
+</div>
+
+
+</section>
+</section>
+
+ ]]></description>
+  <guid>https://github.com/tyoc213/blog/posts/2020-05-26-reconocer-dígitos.html</guid>
+  <pubDate>Tue, 26 May 2020 05:00:00 GMT</pubDate>
+</item>
+</channel>
+</rss>

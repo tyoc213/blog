@@ -1,1 +1,1 @@
-Sitemap: https://tyoc213.github.io/blog/sitemap.xml
+Sitemap: https://github.com/tyoc213/blog/sitemap.xml
