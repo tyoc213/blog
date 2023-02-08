@@ -3,6 +3,8 @@ project:
 
 website:
   title: "tyoc213 blog's"
+  site-url: https://github.com/tyoc213/blog
+  description: "About dev and things"
   navbar:
     right:
       - about.qmd
